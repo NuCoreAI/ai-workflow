@@ -1,0 +1,3 @@
+git+https://github.com/advanced-stack/llm-tap.git
+git+https://github.com/advanced-stack/llama-cpp-python.git@feature/ranking
+requests

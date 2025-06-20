@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-workflow"
+version = "0.0.1"
+description = "Lightweight library for building IOX programs with LLMs"
+readme = "README.md"
+license = "MIT"
+authors = [
+ { name="P.A. SCHEMBRI", email="pa.schembri@advanced-stack.com" }
+]
+dependencies = [
+ "requests",
+ "llm-tap @ git+https://github.com/advanced-stack/llm-tap.git",
+ "llama-cpp-python @ git+https://github.com/advanced-stack/llama-cpp-python.git@feature/ranking"
+]
+urls = { "Homepage" = "https://github.com/NuCoreAI/ai-workflow.git" }
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["ai_iox_workflow"]
