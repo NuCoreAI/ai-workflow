@@ -192,13 +192,12 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
-qwen3-0.6b
-qwen3-1.7b
-qwen3-4b
+qwen*
 tinybert
-bge-reranker-v2-m3
-jina-reranker-v1-tiny
-jina-reranker-v2
+bge-*
+jina*
+llama*
+mistral*
 example.py
 activate
 bin

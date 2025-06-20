@@ -1,13 +1,11 @@
 import itertools
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from llm_tap import llm
 from llm_tap import models as tap_models
 from llm_tap.models import (
     Place,
     Workflow,
-    Condition,
-    TransitionSet,
     TokenType,
     register_place,
     get_places,
@@ -15,7 +13,6 @@ from llm_tap.models import (
     is_source,
     is_sink,
     clear,
-    instructions,
 )
 
 from .iox.node import Node
@@ -93,8 +90,7 @@ class Builder:
     profile: Profile
     nodes: list[Node]
 
-    workflow_llm_model: str = "qwen3-1.7b"
-    llm_model: str = "qwen3-1.7b"
+    workflow_llm_model: str = "qwen3-4b"
     reranker_model: str = "bge-reranker-v2-m3"
 
     @classmethod
@@ -132,109 +128,46 @@ class Builder:
             n_ctx=4_000,
         )
 
-        places = get_places()
-        place_names = places_str()
-
         with reranker as r:
+            places = get_places()
+            place_names = places_str()
             scores = r.rank(query, place_names)
             results = zip(places, scores)
             results = sorted(results, key=lambda t: t[1], reverse=True)
-            at_least_10_at_most_10_percent = max(10, int(10 / len(places)))
-            top_10 = itertools.islice(results, at_least_10_at_most_10_percent)
-            return [p for p, _ in top_10]
-
-    def build_conditions(self, query, places):
-        generator_model = llm.LLamaCPP(
-            model=self.llm_model,
-            n_ctx=4_000,
-        )
-
-        with self.place_registry(places=places):
-            with generator_model as condition_builder:
-                for place in filter(is_source, places):
-                    prompt = "\n".join(
-                        (
-                            f"query: {query}",
-                            f"place: {place.name}, {place.description}",
-                            "Identify condition applicable to query and place",
-                        )
-                    )
-                    condition = condition_builder.parse(
-                        data_class=Condition,
-                        prompt=prompt,
-                    )
-                    yield place, condition
-
-    def build_place_set_class(self, query):
-        with self.place_registry(nodes=self.nodes):
-            places = self.most_relevant_places(query)
-
-            sensors = list(filter(is_source, places))
-            sensor_names = set(map(str, sensors))
-            commands = list(filter(is_sink, places))
-            command_names = set(map(str, commands))
-
-            @dataclass
-            class SensorSelector:
-                name: str = field(metadata={"choices": lambda: sensor_names})
-
-            @dataclass
-            class CommandSelector:
-                name: str = field(metadata={"choices": lambda: command_names})
-
-            @dataclass
-            class PlaceSet:
-                sensors: list[SensorSelector]
-                commands: list[CommandSelector]
-
-            return PlaceSet
+            top = itertools.islice(results, 12)
+            return [p for p, _ in top]
 
     def retrieve_relevant_places(self, query):
-        PlaceSet = self.build_place_set_class(query)
-        prompt = "\n".join(
-            (
-                f"query: {query}",
-                "Identify all inputs and outputs relevant to the query.",
-            )
-        )
-        generator_model = llm.LLamaCPP(
-            model=self.llm_model,
-            n_ctx=4_000,
-        )
-        with generator_model as place_set_builder:
-            place_set = place_set_builder.parse(
-                data_class=PlaceSet,
-                prompt=prompt,
-                system_prompt=instructions,
-            )
-
-        query_node_names = map(
-            lambda p: p.name, place_set.sensors + place_set.commands
-        )
-        places = self.get_places(query_node_names)
-        return places
+        with self.place_registry(nodes=self.nodes):
+            places = self.most_relevant_places(query)
+            return places
 
     def generate_workflow(self, query):
+        print("Identifying relevant nodes...")
         places = self.retrieve_relevant_places(query)
+
         prompt = "\n".join(
             (
-                f"query: {query}",
-                "Accurately convert the query into a workflow.",
+                "# Context",
+                "\n\n----\n\n".join([place.details() for place in places]),
+                "----",
+                "# Instructions",
+                f"Query: {query}",
+                "Convert the query into a workflow.",
             )
         )
+        print(prompt)
 
         generator_model = llm.LLamaCPP(
             model=self.workflow_llm_model,
-            n_ctx=4_000,
+            n_ctx=8_000,
         )
 
+        print("Building workflow...")
         with self.place_registry(places=places):
             with generator_model as workflow_builder:
                 workflow = workflow_builder.parse(
                     data_class=Workflow,
                     prompt=prompt,
                 )
-
-            workflow_places = list(filter(lambda p: p in workflow, places))
-            for p, c in self.build_conditions(query, workflow_places):
-
+                return workflow
