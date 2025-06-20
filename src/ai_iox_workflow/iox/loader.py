@@ -1,5 +1,6 @@
-import argparse
 import json
+import logging
+import argparse
 import xml.etree.ElementTree as ET
 from .profile import Profile, Family, Instance
 from .editor import Editor, EditorSubsetRange, EditorMinMaxRange
@@ -10,8 +11,11 @@ from .cmd import Command, CommandParameter
 from .uom import get_uom_by_id
 
 
-def format_error(msg):
-    print(f"[PROFILE FORMAT ERROR] {msg}")
+logger = logging.getLogger(__name__)
+
+
+def debug(msg):
+    logger.debug(f"[PROFILE FORMAT ERROR] {msg}")
 
 
 def load_profile(json_path):
@@ -26,14 +30,14 @@ def parse_profile(raw):
     for fidx, f in enumerate(raw.get("families", [])):
         # Validate keys / format
         if "id" not in f:
-            format_error(f"Family {fidx} missing 'id'")
+            debug(f"Family {fidx} missing 'id'")
         instances = []
         for iidx, i in enumerate(f.get("instances", [])):
             # Build Editors for reference first
             editors_dict = {}
             for edict in i.get("editors", []):
                 if "id" not in edict:
-                    format_error("Editor missing 'id'")
+                    debug("Editor missing 'id'")
                     continue
                 editors_dict[edict["id"]] = build_editor(edict)
             # Build LinkDefs
@@ -43,14 +47,12 @@ def parse_profile(raw):
                 params = []
                 for p in ldict.get("parameters", []):
                     if "editor" not in p:
-                        format_error(f"LinkDef param missing 'editor': {p}")
+                        debug(f"LinkDef param missing 'editor': {p}")
                         continue
                     eid = p["editor"]
                     editor = editors_dict.get(eid)
                     if not editor:
-                        format_error(
-                            f"Editor '{eid}' not found for linkdef param"
-                        )
+                        debug(f"Editor '{eid}' not found for linkdef param")
                     params.append(
                         LinkParameter(
                             id=p["id"],
@@ -78,7 +80,7 @@ def parse_profile(raw):
                     eid = pdict["editor"]
                     editor = editors_dict.get(eid)
                     if not editor:
-                        format_error(
+                        debug(
                             f"Editor '{eid}' not found for property '{pdict.get('id')}' in nodedef '{ndict['id']}'"
                         )
                     props.append(
@@ -103,7 +105,7 @@ def parse_profile(raw):
                             eid = p["editor"]
                             editor = editors_dict.get(eid)
                             if not editor:
-                                format_error(
+                                debug(
                                     f"Editor '{eid}' not found for command param"
                                 )
                             params.append(
@@ -164,7 +166,7 @@ def build_editor(edict) -> Editor:
         uom_id = rng["uom"]
         uom = get_uom_by_id(uom_id)
         if not uom:
-            format_error(f"UOM '{uom_id}' not found")
+            debug(f"UOM '{uom_id}' not found")
         # MinMaxRange or Subset
         if "min" in rng and "max" in rng:
             ranges.append(
@@ -184,7 +186,7 @@ def build_editor(edict) -> Editor:
                 )
             )
         else:
-            format_error(f"Range must have either min/max or subset: {rng}")
+            debug(f"Range must have either min/max or subset: {rng}")
     return Editor(id=edict["id"], ranges=ranges)
 
 
@@ -260,7 +262,7 @@ def load_nodes(xml_path, profile=None):
         if profile and node_def_id:
             node.node_def = nodedef_lookup.get(node_def_id)
             if not node.node_def:
-                print(f"[WARN] No NodeDef found for: {node_def_id}")
+                debug(f"[WARN] No NodeDef found for: {node_def_id}")
 
         nodes.append(node)
 
