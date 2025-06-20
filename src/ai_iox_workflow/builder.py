@@ -10,8 +10,6 @@ from llm_tap.models import (
     register_place,
     get_places,
     places_str,
-    is_source,
-    is_sink,
     clear,
 )
 
@@ -22,6 +20,18 @@ from .iox.loader import load_profile, load_nodes
 
 tap_models.SOURCE = "sensor"
 tap_models.SINK = "command"
+
+system_prompt = """
+You are given a set of sensors and commands.
+
+The user needs to map his query to some kind of pseudo code.
+
+Checklist:
+- set sensors and commands that are relevant to the query
+- set values (discrete, continuous) based on the query
+- set conditions based on the query
+
+"""
 
 
 def make_places(node):
@@ -134,7 +144,11 @@ class Builder:
             scores = r.rank(query, place_names)
             results = zip(places, scores)
             results = sorted(results, key=lambda t: t[1], reverse=True)
-            top = itertools.islice(results, 12)
+            top = sorted(
+                itertools.islice(results, 12),
+                key=lambda t: t[0].type,
+                reverse=True,
+            )
             return [p for p, _ in top]
 
     def retrieve_relevant_places(self, query):
@@ -146,17 +160,20 @@ class Builder:
         print("Identifying relevant nodes...")
         places = self.retrieve_relevant_places(query)
 
-        prompt = "\n".join(
-            (
-                "# Context",
-                "\n\n----\n\n".join([place.details() for place in places]),
-                "----",
-                "# Instructions",
-                f"Query: {query}",
-                "Convert the query into a workflow.",
+        print("Found:")
+        for p in places:
+            print(f"- {p}")
+
+        with self.place_registry(places=places):
+            prompt = "\n".join(
+                (
+                    "\n\n----\n\n".join([place.details() for place in places]),
+                    "----",
+                    "====",
+                    f"Query: {query}",
+                    "Convert the query into a workflow (inputs => conditions => output)",
+                )
             )
-        )
-        print(prompt)
 
         generator_model = llm.LLamaCPP(
             model=self.workflow_llm_model,
@@ -169,5 +186,7 @@ class Builder:
                 workflow = workflow_builder.parse(
                     data_class=Workflow,
                     prompt=prompt,
+                    system_prompt=system_prompt,
                 )
+                workflow.print()
                 return workflow

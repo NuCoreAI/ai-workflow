@@ -31,7 +31,7 @@ class EditorSubsetRange:
                 else:
                     parts.append(s)
         subset_str = ", ".join(parts)
-        return f"Values: {subset_str} {self.uom}"
+        return f"Discrete values: {subset_str} {self.uom}"
 
 
 @dataclass
@@ -48,13 +48,18 @@ class EditorMinMaxRange:
     names: dict = field(default_factory=dict)
 
     def __str__(self):
-        parts = [f"Range: {self.min} -> {self.max}"]
+        if self.uom.id == "25":
+            label = "Discrete values"
+        else:
+            label = "Range"
+
+        parts = [f"{label}: {self.min} -> {self.max} {self.uom}"]
 
         if self.step:
-            parts.append(f" by step of {self.step} {self.uom}.")
+            parts.append(f" by step of {self.step}.")
 
         if self.names:
-            parts.append(" values: ")
+            parts.append(" mapping: ")
             parts.append(
                 ", ".join([f"{k} => {v}" for k, v in self.names.items()])
             )
