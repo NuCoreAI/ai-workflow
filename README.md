@@ -93,9 +93,9 @@ JSON Representation
 }
 ```
 
-## Workflow structure
+## Workflow schema
 
-See [Workflow class in models.py from llm-tap](https://github.com/advanced-stack/llm-tap/blob/main/src/llm_tap/models.py)
+See the [Workflow, Transition, Place, TokenType classes in models.py from llm-tap](https://github.com/advanced-stack/llm-tap/blob/main/src/llm_tap/models.py)
 
 ## CLI
 
