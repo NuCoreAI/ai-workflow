@@ -201,3 +201,5 @@ mistral*
 example.py
 activate
 bin
+profile.json
+nodes.xml

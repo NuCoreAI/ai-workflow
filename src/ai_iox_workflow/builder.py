@@ -16,21 +16,21 @@ from llm_tap.models import (
 from .iox.node import Node
 from .iox.profile import Profile
 from .iox.loader import load_profile, load_nodes
+from .iox.editor import EditorMinMaxRange, EditorSubsetRange
 
 
 tap_models.SOURCE = "sensor"
 tap_models.SINK = "command"
 
-system_prompt = """
-You are given a set of sensors and commands.
+system_prompt = """You are given a set of sensors and commands.
 
-The user needs to map his query to some kind of pseudo code.
+Map queries to workflows
+
+IF < conditions > TRANSITION < state change >
 
 Checklist:
-- set sensors and commands that are relevant to the query
-- set values (discrete, continuous) based on the query
-- set conditions based on the query
-
+- Select sensors and commands relevant to the query
+- Define values based on the query
 """
 
 
@@ -48,9 +48,34 @@ def make_places(node):
             continue
 
         description = str(prop.editor.ranges[0])
+        editor_range = prop.editor.ranges[0]
         property_uom = prop.editor.ranges[0].uom
-        value_type = "INT" if property_uom.id == "25" else "FLOAT"
-        token_type = TokenType(name=prop.name, type=value_type)
+
+        if isinstance(editor_range, EditorSubsetRange):
+            value_type = "DISCRETE"
+            sub_type = int
+            if editor_range.names:
+                token_range = tuple(
+                    [f"{v}" for k, v in editor_range.names.items()]
+                )
+
+        elif isinstance(editor_range, EditorMinMaxRange):
+            value_type = "NUMERIC"
+
+            if property_uom.id == "25":
+                sub_type = int
+            else:
+                sub_type = float
+
+            if editor_range.names:
+                token_range = tuple(
+                    [f"{v}" for k, v in editor_range.names.items()]
+                )
+                value_type = "DISCRETE"
+            else:
+                token_range = (editor_range.min, editor_range.max)
+
+        token_type = TokenType(prop.name, value_type, token_range, sub_type)
 
         register_place(
             Place(
@@ -69,21 +94,34 @@ def make_places(node):
                 or not param.editor.ranges
             ):
                 continue
+
             editor_range = param.editor.ranges[0]
 
-            # Choose INT/FLOAT based on uom
-            uom = editor_range.uom
+            if isinstance(editor_range, EditorSubsetRange):
+                value_type = "DISCRETE"
+                sub_type = int
+                if editor_range.names:
+                    token_range = tuple(
+                        [f"{v}" for k, v in editor_range.names.items()]
+                    )
 
-            # Improve logic here (if prec = 0, step = 1 => INT)
-            if uom.id == "25" or (
-                getattr(editor_range, "step", 0) == 1
-                and getattr(editor_range, "prec", -1) == 0
-            ):
-                value_type = "INT"
-            else:
-                value_type = "FLOAT"
+            elif isinstance(editor_range, EditorMinMaxRange):
+                value_type = "NUMERIC"
 
-            token_type = TokenType(name=cmd.name, type=value_type)
+                if property_uom.id == "25":
+                    sub_type = int
+                else:
+                    sub_type = float
+
+                if editor_range.names:
+                    token_range = tuple(
+                        [f"{v}" for k, v in editor_range.names.items()]
+                    )
+                    value_type = "DISCRETE"
+                else:
+                    token_range = (editor_range.min, editor_range.max)
+
+            token_type = TokenType(cmd.name, value_type, token_range, sub_type)
 
             register_place(
                 Place(
@@ -100,8 +138,9 @@ class Builder:
     profile: Profile
     nodes: list[Node]
 
-    workflow_llm_model: str = "qwen3-4b"
+    workflow_llm_model: str = "qwen3-1.7b"
     reranker_model: str = "bge-reranker-v2-m3"
+    max_ranking_results: int = 10
 
     @classmethod
     def from_file(cls, profile_path, nodes_path):
@@ -145,7 +184,7 @@ class Builder:
             results = zip(places, scores)
             results = sorted(results, key=lambda t: t[1], reverse=True)
             top = sorted(
-                itertools.islice(results, 12),
+                itertools.islice(results, self.max_ranking_results),
                 key=lambda t: t[0].type,
                 reverse=True,
             )
@@ -157,6 +196,7 @@ class Builder:
             return places
 
     def generate_workflow(self, query):
+        context_size = 8_000
         print("Identifying relevant nodes...")
         places = self.retrieve_relevant_places(query)
 
@@ -169,15 +209,15 @@ class Builder:
                 (
                     "\n\n----\n\n".join([place.details() for place in places]),
                     "----",
-                    "====",
+                    "",
                     f"Query: {query}",
-                    "Convert the query into a workflow (inputs => conditions => output)",
+                    "Convert the Query",
                 )
             )
 
         generator_model = llm.LLamaCPP(
             model=self.workflow_llm_model,
-            n_ctx=8_000,
+            n_ctx=context_size,
         )
 
         print("Building workflow...")
@@ -188,5 +228,4 @@ class Builder:
                     prompt=prompt,
                     system_prompt=system_prompt,
                 )
-                workflow.print()
                 return workflow
