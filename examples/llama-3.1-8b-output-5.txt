@@ -1,0 +1,58 @@
+Identifying relevant nodes...
+Found:
+- sensor: AudioPlayer [Bluetooth]
+- sensor: AudioPlayer [Playing]
+- sensor: AudioPlayer [Playing Status]
+- sensor: Bluetooth Service [Status]
+- command: AudioPlayer [Remove]
+- command: Bluetooth Service [Service]
+- command: AudioPlayer [Play]
+- command: AudioPlayer [Output]
+- command: AudioPlayer [Volume]
+- command: Batmobile [Play Sounds]
+Building workflow...
+================================================================================
+Original Query: Stop playing music on the AudioPlayer if Bluetooth service is disabled.
+Workflow Details:
+Transition:
+  Guard:
+    Conditions: AND
+      - Bluetooth Service [Status] EQUAL ITokenValue(value='Disabled')
+  Output:
+    Set AudioPlayer [Remove] to None
+================================================================================
+JSON Representation
+{
+  "transition": {
+    "inputs": [
+      {
+        "place": "sensor: Bluetooth Service [Status]"
+      }
+    ],
+    "guard": {
+      "conditions": [
+        {
+          "place_state": {
+            "place": "Bluetooth Service [Status]",
+            "operator": "EQUAL",
+            "value": {
+              "value": "Disabled"
+            }
+          }
+        }
+      ],
+      "conditions_operator": "AND"
+    },
+    "output": {
+      "place": "command: AudioPlayer [Remove]",
+      "token_produced": {
+        "set_value": "AudioPlayer [Remove]",
+        "to": {
+          "value": "None"
+        }
+      }
+    }
+  }
+}
+================================================================================
+Elapsed Time: 73.96 seconds

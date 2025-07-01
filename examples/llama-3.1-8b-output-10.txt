@@ -1,0 +1,58 @@
+Identifying relevant nodes...
+Found:
+- sensor: Charging Info [Battery Charge Target]
+- sensor: Charging Info [Estimated Range]
+- sensor: Charging Info [Time to full charge]
+- sensor: Charging Info [Charge energy added]
+- sensor: Charging Info [Last Command Status]
+- sensor: Charging Info [Charging State]
+- command: Charging Info [Charging Control]
+- command: Charging Info [Set Battery Charge Target]
+- command: Charging Info [Charge Port Control]
+- command: Charging Info [Set Max Charge Current]
+Building workflow...
+================================================================================
+Original Query: Stop charging the electric vehicle if the battery percentage reaches 80%.
+Workflow Details:
+Transition:
+  Guard:
+    Conditions: AND
+      - Charging Info [Battery Charge Target] EQUAL ITokenValue(value='Closed')
+  Output:
+    Set Charging Info [Charging Control] to Stop
+================================================================================
+JSON Representation
+{
+  "transition": {
+    "inputs": [
+      {
+        "place": "sensor: Charging Info [Battery Charge Target]"
+      }
+    ],
+    "guard": {
+      "conditions": [
+        {
+          "place_state": {
+            "place": "Charging Info [Battery Charge Target]",
+            "operator": "EQUAL",
+            "value": {
+              "value": "Closed"
+            }
+          }
+        }
+      ],
+      "conditions_operator": "AND"
+    },
+    "output": {
+      "place": "command: Charging Info [Charging Control]",
+      "token_produced": {
+        "set_value": "Charging Info [Charging Control]",
+        "to": {
+          "value": "Stop"
+        }
+      }
+    }
+  }
+}
+================================================================================
+Elapsed Time: 66.72 seconds

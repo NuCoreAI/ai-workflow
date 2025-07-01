@@ -1,0 +1,58 @@
+Identifying relevant nodes...
+Found:
+- sensor: Ecobee - Office [Occupancy]
+- sensor: Left Hue Light [Status]
+- command: Left Hue Light [On]
+- command: Left Hue Light [On Level]
+- command: Right Hue Light [On]
+- command: Left Hue Light [Identify]
+- command: Right Hue Light [On Level]
+- command: Left Hue Light [Ramp Rate]
+- command: Matter Switch [On]
+- command: Right Hue Light [Identify]
+Building workflow...
+================================================================================
+Original Query: Turn off the lights when the room occupancy is 'Away'.
+Workflow Details:
+Transition:
+  Guard:
+    Conditions: AND
+      - Ecobee - Office [Occupancy] EQUAL ITokenValue(value='No')
+  Output:
+    Set Left Hue Light [On] to 0
+================================================================================
+JSON Representation
+{
+  "transition": {
+    "inputs": [
+      {
+        "place": "sensor: Ecobee - Office [Occupancy]"
+      }
+    ],
+    "guard": {
+      "conditions": [
+        {
+          "place_state": {
+            "place": "Ecobee - Office [Occupancy]",
+            "operator": "EQUAL",
+            "value": {
+              "value": "No"
+            }
+          }
+        }
+      ],
+      "conditions_operator": "AND"
+    },
+    "output": {
+      "place": "command: Left Hue Light [On]",
+      "token_produced": {
+        "set_value": "Left Hue Light [On]",
+        "to": {
+          "value": 0
+        }
+      }
+    }
+  }
+}
+================================================================================
+Elapsed Time: 54.69 seconds
