@@ -120,3 +120,132 @@ options:
   --reranker-model RERANKER_MODEL
                         Accepts GGUF re-ranking models. Qwen3 reranking is *not* yet supported by llama.cpp.
 ```
+
+
+## Example queries
+
+1. "Turn on the fan when the temperature exceeds 30°C in the office."
+2. "If the electricity price is below 0.5$, start charging the car."
+3. "Set the thermostat to cooling mode if the room temperature is above 75°F."
+4. "Activate the siren when the door is forced open."
+5. "Change the light color to blue when it's cloudy outside."
+6. "Stop playing music on the AudioPlayer if Bluetooth service is disabled."
+7. "Turn off the lights when the room occupancy is 'Away'."
+8. "Start the fan for 10 minutes if the humidity is above 70%."
+9. "Dim the lights to 50% when it's nighttime."
+10. "Increase the thermostat heat setpoint by 2°C when the weather is cold."
+11. "Stop charging the electric vehicle if the battery percentage reaches 80%."
+12. "Enable Weather updates when it's enabled in the system."
+13. "Unlock the front door when security mode is disarmed."
+14. "Close the charge port if the EV battery is full."
+15. "Turn off the relay if the price of electricity exceeds $1.2 per kWh."
+16. "Start the audio playback on the speaker if Bluetooth is paired."
+17. "Turn off all lights if any light's status is 'Off'."
+18. "Activate the dehumidifier when indoor humidity exceeds 60%."
+19. "If the air quality score is poor, adjust the HVAC system to improve air quality."
+20. "Play a sound notification on the AudioPlayer when the door is opened."
+
+
+To run the example queries and store each result in a dedicated text file, you can use the following commands:
+
+```shell
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Turn on the fan when the temperature exceeds 30°C in the office." > output1.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "If the electricity price is below 0.5$, start charging the car." > output2.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Set the thermostat to cooling mode if the room temperature is above 75°F." > output3.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Activate the siren when the door is forced open." > output4.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Change the light color to blue when it's cloudy outside." > output5.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Stop playing music on the AudioPlayer if Bluetooth service is disabled." > output6.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Turn off the lights when the room occupancy is 'Away'." > output7.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Start the fan for 10 minutes if the humidity is above 70%." > output8.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Dim the lights to 50% when it's nighttime." > output9.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Increase the thermostat heat setpoint by 2°C when the weather is cold." > output10.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Stop charging the electric vehicle if the battery percentage reaches 80%." > output11.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Enable Weather updates when it's enabled in the system." > output12.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Unlock the front door when security mode is disarmed." > output13.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Close the charge port if the EV battery is full." > output14.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Turn off the relay if the price of electricity exceeds $1.2 per kWh." > output15.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Start the audio playback on the speaker if Bluetooth is paired." > output16.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Turn off all lights if any light's status is 'Off'." > output17.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Activate the dehumidifier when indoor humidity exceeds 60%." > output18.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "If the air quality score is poor, adjust the HVAC system to improve air quality." > output19.txt
+
+python3 -m ai_iox_workflow.cli \
+  --profile profile.json \
+  --nodes nodes.xml \
+  "Play a sound notification on the AudioPlayer when the door is opened." > output20.txt
+```
