@@ -1,0 +1,58 @@
+Identifying relevant nodes...
+Found:
+- sensor: Batmobile [Front Passenger Window]
+- sensor: Batmobile [Front Driver Window]
+- sensor: Batmobile [EV Door State]
+- sensor: Batmobile [Tire Front Right]
+- sensor: Batmobile [Tire Front Left]
+- command: Batmobile [Control Doors]
+- command: Batmobile [Sentry Mode]
+- command: Ecobee - Office [Mode]
+- command: Ecobee - Office [Fan Mode]
+- command: Ecobee - Office [Schedule Mode]
+Building workflow...
+================================================================================
+Original Query: Unlock the front door when security mode is disarmed.
+Workflow Details:
+Transition:
+  Guard:
+    Conditions: OR
+      - Batmobile [Front Driver Window] EQUAL ITokenValue(value='Closed')
+  Output:
+    Set Batmobile [Control Doors] to Unlocked
+================================================================================
+JSON Representation
+{
+  "transition": {
+    "inputs": [
+      {
+        "place": "sensor: Batmobile [Front Driver Window]"
+      }
+    ],
+    "guard": {
+      "conditions": [
+        {
+          "place_state": {
+            "place": "Batmobile [Front Driver Window]",
+            "operator": "EQUAL",
+            "value": {
+              "value": "Closed"
+            }
+          }
+        }
+      ],
+      "conditions_operator": "OR"
+    },
+    "output": {
+      "place": "command: Batmobile [Control Doors]",
+      "token_produced": {
+        "set_value": "Batmobile [Control Doors]",
+        "to": {
+          "value": "Unlocked"
+        }
+      }
+    }
+  }
+}
+================================================================================
+Elapsed Time: 64.30 seconds

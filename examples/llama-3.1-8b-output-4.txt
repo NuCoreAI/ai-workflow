@@ -1,0 +1,13 @@
+Identifying relevant nodes...
+Found:
+- command: Left Hue Light [On]
+- command: Left Hue Light [On Level]
+- command: Left Hue Color Hue-Sat [Move To Hue]
+- command: Right Hue Light [On]
+- command: Left Hue Light [Identify]
+- command: Left Hue Color Hue-Sat [Move Hue]
+- command: Right Hue Light [On Level]
+- command: Right Hue Color Hue-Sat [Move To Hue]
+- command: Left Hue Light [Ramp Rate]
+- command: Right Hue Color Hue-Sat [Move Hue]
+Building workflow...

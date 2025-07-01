@@ -1,0 +1,58 @@
+Identifying relevant nodes...
+Found:
+- sensor: Utility Signals (oadr3) [GHG]
+- sensor: Ecobee - Forecast [Humidity]
+- sensor: Ecobee - Office [Humidity]
+- sensor: Ecobee - Weather [Humidity]
+- sensor: Climate Info [Auto Conditioning]
+- command: Ecobee - Office [Fan On Time]
+- command: Ecobee - Office [Fan Mode]
+- command: Ecobee - Office [Humidification Setpoint]
+- command: Ecobee - Office [Dehumidification Setpoint]
+- command: Matter Switch [On]
+Building workflow...
+================================================================================
+Original Query: Start the fan for 10 minutes if the humidity is above 70%.
+Workflow Details:
+Transition:
+  Guard:
+    Conditions: AND
+      - Ecobee - Forecast [Humidity] GREATER THAN ITokenValue(value=70)
+  Output:
+    Set Ecobee - Office [Fan On Time] to 10
+================================================================================
+JSON Representation
+{
+  "transition": {
+    "inputs": [
+      {
+        "place": "sensor: Ecobee - Forecast [Humidity]"
+      }
+    ],
+    "guard": {
+      "conditions": [
+        {
+          "place_state": {
+            "place": "Ecobee - Forecast [Humidity]",
+            "operator": "GREATER THAN",
+            "value": {
+              "value": 70
+            }
+          }
+        }
+      ],
+      "conditions_operator": "AND"
+    },
+    "output": {
+      "place": "command: Ecobee - Office [Fan On Time]",
+      "token_produced": {
+        "set_value": "Ecobee - Office [Fan On Time]",
+        "to": {
+          "value": 10
+        }
+      }
+    }
+  }
+}
+================================================================================
+Elapsed Time: 61.09 seconds

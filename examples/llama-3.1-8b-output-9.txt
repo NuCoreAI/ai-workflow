@@ -1,0 +1,58 @@
+Identifying relevant nodes...
+Found:
+- sensor: Climate Info [Driver Side Temp Setting]
+- sensor: Climate Info [Passenger Side Temp Setting]
+- sensor: Climate Info [Outdoor Temperature]
+- sensor: Climate Info [Auto Conditioning]
+- sensor: Ecobee - Weather [Low Temp]
+- command: Ecobee - Office [Cool Setpoint]
+- command: Ecobee - Office [Setpoint Up]
+- command: Ecobee - Office [Heat Setpoint]
+- command: Right Hue Color XY [Move To Temperature]
+- command: Left Hue Color XY [Move Temperature]
+Building workflow...
+================================================================================
+Original Query: Increase the thermostat heat setpoint by 2°C when the weather is cold.
+Workflow Details:
+Transition:
+  Guard:
+    Conditions: AND
+      - Climate Info [Outdoor Temperature] LESS THAN ITokenValue(value=0)
+  Output:
+    Set Ecobee - Office [Heat Setpoint] to 2
+================================================================================
+JSON Representation
+{
+  "transition": {
+    "inputs": [
+      {
+        "place": "sensor: Climate Info [Outdoor Temperature]"
+      }
+    ],
+    "guard": {
+      "conditions": [
+        {
+          "place_state": {
+            "place": "Climate Info [Outdoor Temperature]",
+            "operator": "LESS THAN",
+            "value": {
+              "value": 0
+            }
+          }
+        }
+      ],
+      "conditions_operator": "AND"
+    },
+    "output": {
+      "place": "command: Ecobee - Office [Heat Setpoint]",
+      "token_produced": {
+        "set_value": "Ecobee - Office [Heat Setpoint]",
+        "to": {
+          "value": 2
+        }
+      }
+    }
+  }
+}
+================================================================================
+Elapsed Time: 60.38 seconds

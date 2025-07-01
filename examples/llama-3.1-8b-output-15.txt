@@ -1,0 +1,58 @@
+Identifying relevant nodes...
+Found:
+- sensor: AudioPlayer [Bluetooth]
+- sensor: AudioPlayer [Playing]
+- sensor: Bluetooth Service [Status]
+- sensor: AudioPlayer [Playing Status]
+- sensor: Batmobile [Nbr Homelink devices reg'd]
+- command: AudioPlayer [Play]
+- command: Bluetooth Service [Service]
+- command: AudioPlayer [Output]
+- command: AudioPlayer [Volume]
+- command: Batmobile [Play Sounds]
+Building workflow...
+================================================================================
+Original Query: Start the audio playback on the speaker if Bluetooth is paired.
+Workflow Details:
+Transition:
+  Guard:
+    Conditions: AND
+      - AudioPlayer [Bluetooth] EQUAL ITokenValue(value='Enabled')
+  Output:
+    Set AudioPlayer [Play] to computer.mp3
+================================================================================
+JSON Representation
+{
+  "transition": {
+    "inputs": [
+      {
+        "place": "sensor: AudioPlayer [Bluetooth]"
+      }
+    ],
+    "guard": {
+      "conditions": [
+        {
+          "place_state": {
+            "place": "AudioPlayer [Bluetooth]",
+            "operator": "EQUAL",
+            "value": {
+              "value": "Enabled"
+            }
+          }
+        }
+      ],
+      "conditions_operator": "AND"
+    },
+    "output": {
+      "place": "command: AudioPlayer [Play]",
+      "token_produced": {
+        "set_value": "AudioPlayer [Play]",
+        "to": {
+          "value": "computer.mp3"
+        }
+      }
+    }
+  }
+}
+================================================================================
+Elapsed Time: 71.38 seconds

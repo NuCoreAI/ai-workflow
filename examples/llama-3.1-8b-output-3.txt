@@ -1,0 +1,58 @@
+Identifying relevant nodes...
+Found:
+- sensor: Batmobile [EV Door State]
+- sensor: Ecobee Controller [Authorized]
+- sensor: Oadr3 Controller [Status]
+- sensor: Batmobile [Nbr Homelink devices reg'd]
+- sensor: Matter Switch [Responding]
+- command: Batmobile [Control Doors]
+- command: Matter Switch [On]
+- command: ZWave Switch [On]
+- command: ZWave Switch [Set Configuration]
+- command: Batmobile [Sentry Mode]
+Building workflow...
+================================================================================
+Original Query: Activate the siren when the door is forced open.
+Workflow Details:
+Transition:
+  Guard:
+    Conditions: AND
+      - Batmobile [EV Door State] EQUAL ITokenValue(value='Unlocked')
+  Output:
+    Set Batmobile [Sentry Mode] to Enable
+================================================================================
+JSON Representation
+{
+  "transition": {
+    "inputs": [
+      {
+        "place": "sensor: Batmobile [EV Door State]"
+      }
+    ],
+    "guard": {
+      "conditions": [
+        {
+          "place_state": {
+            "place": "Batmobile [EV Door State]",
+            "operator": "EQUAL",
+            "value": {
+              "value": "Unlocked"
+            }
+          }
+        }
+      ],
+      "conditions_operator": "AND"
+    },
+    "output": {
+      "place": "command: Batmobile [Sentry Mode]",
+      "token_produced": {
+        "set_value": "Batmobile [Sentry Mode]",
+        "to": {
+          "value": "Enable"
+        }
+      }
+    }
+  }
+}
+================================================================================
+Elapsed Time: 61.19 seconds
