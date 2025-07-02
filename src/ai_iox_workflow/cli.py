@@ -34,6 +34,12 @@ def main():
         help="Accepts GGUF re-ranking models. Qwen3 reranking is *not* yet supported by llama.cpp.",
     )
 
+    parser.add_argument(
+        "--output-workflow",
+        type=str,
+        help="Write generated workflow json file",
+    )
+
     args = parser.parse_args()
 
     builder = Builder.from_file(
@@ -53,7 +59,12 @@ def main():
     print(workflow)
     print("=" * 80)
     print("JSON Representation")
-    print(json.dumps(asdict(workflow), indent=2))
+    workflow_data = json.dumps(asdict(workflow), indent=2)
+    print(workflow_data)
+    if args.output_workflow:
+        with open(args.output_workflow, "w") as file:
+            file.write(workflow_data)
+
     print("=" * 80)
     print(f"Elapsed Time: {elapsed_time:.2f} seconds")
 
