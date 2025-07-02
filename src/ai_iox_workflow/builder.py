@@ -24,9 +24,19 @@ tap_models.SINK = "command"
 
 system_prompt = """You are given a set of sensors and commands.
 
-Map queries to workflows
+Map queries to workflows:
 
-IF < conditions > TRANSITION < state change >
+- Sensor 1
+- Sensor < n >
+
+IF:
+
+< condition 1 on sensor 1 >
+< condition n on sensor n >
+
+TRANSITION
+
+< state change >
 
 Checklist:
 - Select sensors and commands relevant to the query

@@ -93,6 +93,34 @@ JSON Representation
 }
 ```
 
+## Using the UI
+
+First install dependencies:
+
+```shell
+cd ui/
+npm i
+
+# then launch the dev server:
+
+npx vite dev
+
+# browse to http://localhost:5173/
+```
+
+Then generate a workflow with `--output-workflow`
+
+```shell
+python3 -m ai_iox_workflow.cli \
+    --workflow-llm-model qwen3-1.7b \
+    --profile profile.json \
+    --nodes nodes.xml \
+    --output-workflow ui/client/public/assets/workflow.json \
+    "If the electricity price is lower than 0.4 and the remaining range of the car is under 100 miles, charge the car"
+```
+
+![](./assets/llm-tap-ui.png)
+
 ## Workflow schema
 
 See the [Workflow, Transition, Place, TokenType classes in models.py from llm-tap](https://github.com/advanced-stack/llm-tap/blob/main/src/llm_tap/models.py)

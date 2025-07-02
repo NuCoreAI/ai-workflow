@@ -1,0 +1,44 @@
+{
+  "transition": {
+    "inputs": [
+      {
+        "place": "sensor: Utility Signals (oadr3) [Electricity price]"
+      },
+      {
+        "place": "sensor: Charging Info [Estimated Range]"
+      }
+    ],
+    "guard": {
+      "conditions": [
+        {
+          "place_state": {
+            "place": "Utility Signals (oadr3) [Electricity price]",
+            "operator": "LESS THAN",
+            "value": {
+              "value": 0.4
+            }
+          }
+        },
+        {
+          "place_state": {
+            "place": "Charging Info [Estimated Range]",
+            "operator": "LESS THAN",
+            "value": {
+              "value": 100
+            }
+          }
+        }
+      ],
+      "conditions_operator": "AND"
+    },
+    "output": {
+      "place": "command: Charging Info [Charging Control]",
+      "token_produced": {
+        "set_value": "Charging Info [Charging Control]",
+        "to": {
+          "value": "Start"
+        }
+      }
+    }
+  }
+}
