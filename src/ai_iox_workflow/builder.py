@@ -13,10 +13,10 @@ from llm_tap.models import (
     clear,
 )
 
-from .iox.node import Node
-from .iox.profile import Profile
-from .iox.loader import load_profile, load_nodes
-from .iox.editor import EditorMinMaxRange, EditorSubsetRange
+from iox.node import Node
+from iox.profile import Profile
+from iox.loader import load_profile, load_nodes
+from iox.editor import EditorMinMaxRange, EditorSubsetRange
 
 
 tap_models.SOURCE = "sensor"
