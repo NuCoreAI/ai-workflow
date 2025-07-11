@@ -89,6 +89,8 @@ if __name__ == "__main__":
         type=str,
         help="The query to generate the workflow from.",
     )
+    import os
+    print(os.getcwd())
 
     args = parser.parse_args()
     query = args.query
@@ -96,8 +98,6 @@ if __name__ == "__main__":
         query = input("what's your query?") 
 
     config=AIConfig(args.data_path, args.model_path)
-    import os
-    print(os.getcwd())
 
     main(
         profile=config.getProfile(args.profile),
