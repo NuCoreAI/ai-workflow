@@ -33,6 +33,14 @@
             "justMyCode": false
         },
         {
+            "name": "reranker", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/ai_iox_workflow/assistant/reranker.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "workflow", 
             "type": "debugpy",
             "request": "launch",
