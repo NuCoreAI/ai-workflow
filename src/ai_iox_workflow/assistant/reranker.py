@@ -1,4 +1,4 @@
-import json,requests
+import json,requests,re
 API_URL = "http://localhost:8000/v1/rerank"
 
 
@@ -11,10 +11,13 @@ class ToolReranker:
         with open(tools_path, "r") as f:
             self.tools = json.load(f) 
 
+    def is_question(self, text):
+        return text.strip().endswith("?") or bool(re.match(r"^(who|what|when|where|why|how)\b", text.strip().lower()))
+
     def select_tool(self, query):
         payload = {
             "model": "bge-reranker",
-            "query": query,
+            "query": "[QUESTION] " + query if self.is_question(query) else "[STATEMENT] " + query,
             "documents": [f"{tool['function']['name']}: {tool['function']['description']}" for tool in self.tools],
         }
         response = requests.post(API_URL, json=payload)
@@ -30,9 +33,16 @@ class ToolReranker:
             data['results'].sort(key=lambda x: x['relevance_score'], reverse=True)
             #print(json.dumps(data, indent=4))
             index = data['results'][0]['index']
-            print (f"Selected tool = {self.tools[index]['function']['name']}")
-            index = data['results'][1]['index']
-            print (f"Selected tool = {self.tools[index]['function']['name']}")
+            relevance_score = data['results'][0]['relevance_score']
+            if relevance_score > 3.0:
+                print (f"Selected tool = {self.tools[index]['function']['name']}")
+            elif relevance_score < -5.0:
+                print("I have no idea what you are asking, please rephrase your question.")
+            else:
+                print (f"Possible tool 1 {relevance_score} = {self.tools[index]['function']['name']}")
+                index = data['results'][1]['index']
+                relevance_score = data['results'][1]['relevance_score']
+                print (f"Possible tool 2 {relevance_score} = {self.tools[index]['function']['name']}")
         
 
 def main():

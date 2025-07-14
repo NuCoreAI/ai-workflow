@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from .editor import Editor
+from editor import Editor
 
 
 @dataclass
@@ -31,3 +31,9 @@ class LinkDef:
     format: str = None
 
     parameters: list[LinkParameter] = field(default_factory=list)
+
+    def json(self):
+        # very limited for now 
+        return {
+            "name": self.name,
+        }

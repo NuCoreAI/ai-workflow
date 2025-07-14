@@ -47,7 +47,8 @@ class nucoreAPI:
         response = self.__get("/rest/profiles")
         if response == None:
             return None
-        return json.dumps(response.json(), indent=2)
+        return response.json()
+        #return json.dumps(response.json(), indent=2)
 
     def get_nodes(self):
         response = self.__get("/rest/nodes")

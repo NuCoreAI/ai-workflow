@@ -47,6 +47,19 @@
             "program": "src/ai_iox_workflow/cli.py",
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "nucore", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/ai_iox_workflow/iox/nucore.py",
+            "console": "integratedTerminal",
+            "args": [
+               "--url=http://192.168.4.225:8080" ,
+               "--username=admin",
+               "--password=admin"
+            ],
+            "justMyCode": false
         }
     ]
 }

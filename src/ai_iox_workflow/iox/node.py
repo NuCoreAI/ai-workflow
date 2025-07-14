@@ -1,6 +1,6 @@
 from textwrap import indent
 from dataclasses import dataclass, field
-from .nodedef import NodeDef
+from nodedef import NodeDef
 
 
 @dataclass
@@ -51,3 +51,16 @@ class Node:
                 indent(str(self.node_def), "  "),
             )
         )
+
+    def json(self):
+        return {
+            "name": self.name,
+            "address": self.address,
+            "properties":[p.json() for p in self.node_def.properties] if self.node_def else [],
+               "properties":[p.json() for p in self.node_def.properties] if self.node_def else [],
+                   "properties":[p.json() for p in self.node_def.properties] if self.node_def else [],
+            "links": {
+                "ctl": [link for link in self.node_def.links.ctl],
+                "rsp": [link for link in self.node_def.links.rsp],
+            } if self.node_def and self.node_def.links else [],
+        }
