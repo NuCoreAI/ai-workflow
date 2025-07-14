@@ -65,7 +65,7 @@
   "type": "function",
   "function": {
   "name": "general_nucore_info",
-  "description": "This tool answers specific questions about IoX, and NuCore.AI concepts such as plugins, editors, profiles, unit of measure, properties, etc..",
+  "description": "This tool answers specific questions about IoX, and NuCore.AI concepts such as plugins, editors, profiles, unit of measure, uom, nodedefs, properties, etc..",
   "parameters": {
     "type": "object",
     "properties": {
@@ -83,31 +83,8 @@
 {
   "type": "function",
   "function": {
-  "name": "set_comfort_settings",
-  "description": "This tool sets the user's comfort or savings levels (Normal, Moderate, or High). If missing, default to Normal.", 
-  "parameters": {
-    "type": "object",
-    "properties": {
-      "level": {
-        "type": "string",
-        "description": "Extracted comfort settings from the customer input: Normal, Moderate, or High. If not specified, defaults to Normal."
-      },
-      "customer_input": {
-        "type": "string",
-        "description": "original customer input"
-      }
-    },
-    "required": [
-      "level", "customer_input"
-    ]
-  }
-  }
-},
-{
-  "type": "function",
-  "function": {
   "name": "get_comfort_settings",
-  "description": "This tool gets comfort or savings settings", 
+  "description": "This tool retrieves and returns the user's comfort or savings settings and levels (Normal, Moderate, or High).", 
   "parameters": {
     "type": "object",
     "properties": {
@@ -122,6 +99,29 @@
     },
     "required": [
       "mode", "customer_input"
+    ]
+  }
+  }
+},
+{
+  "type": "function",
+  "function": {
+  "name": "set_comfort_settings",
+  "description": "This tool sets the user's comfort or savings settings or levels (Normal, Moderate, or High). If missing, default to Normal.", 
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "level": {
+        "type": "string",
+        "description": "Extracted comfort settings from the customer input: Normal, Moderate, or High. If not specified, defaults to Normal."
+      },
+      "customer_input": {
+        "type": "string",
+        "description": "original customer input"
+      }
+    },
+    "required": [
+      "level", "customer_input"
     ]
   }
   }

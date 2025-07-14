@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from .uom import UOMEntry, supported_uoms
+from uom import UOMEntry, supported_uoms
 
 
 @dataclass
@@ -21,17 +21,42 @@ class EditorSubsetRange:
                 # It's a range 'a-b'
                 parts.append(s)
                 parts.append(
-                    ", ".join([f"{k} => {v}" for k, v in self.names.items()])
+                    ", ".join([f"{k} = {v}" for k, v in self.names.items()])
                 )
             else:
                 # Single value
                 val_name = self.names.get(s)
                 if val_name:
-                    parts.append(f"{s} => {val_name}")
+                    parts.append(f"{s} = {val_name}")
                 else:
                     parts.append(s)
         subset_str = ", ".join(parts)
         return f"Discrete values: {subset_str} {self.uom}"
+    
+    def json(self):
+        label = "Discrete values"
+        description = "Subset of allowed values" 
+        out = {
+            "uom": f"{self.uom.label} = {self.uom.description}",
+            "description": description,
+        }
+        parts = []
+        for s in self.subset.split(","):
+            s = s.strip()
+            if "-" in s:
+                # It's a range 'a-b'
+                out[f"{s}"]=[
+                    { f'"{k}"' : v }
+                      for k, v in self.names.items()
+                ]
+            else:
+                # Single value
+                val_name = self.names.get(s)
+                out[f"{s}"]= val_name
+
+        return out
+
+
 
 
 @dataclass
@@ -53,7 +78,7 @@ class EditorMinMaxRange:
         else:
             label = "Range"
 
-        parts = [f"{label}: {self.min} -> {self.max} {self.uom}"]
+        parts = [f"{label}: between {self.min} and {self.max} {self.uom}"]
 
         if self.step:
             parts.append(f" by step of {self.step}.")
@@ -61,10 +86,28 @@ class EditorMinMaxRange:
         if self.names:
             parts.append(" mapping: ")
             parts.append(
-                ", ".join([f"{k} => {v}" for k, v in self.names.items()])
+                ", ".join([f"{k} = {v}" for k, v in self.names.items()])
             )
         return "".join(parts)
 
+    def json(self):
+        if self.uom.id == "25":
+            label = "Discrete values"
+        else:
+            label = "Range"
+        description = f"{label}: between {self.min} and {self.max} {self.uom}"
+        out = {
+            "uom": f"{self.uom.label} = {self.uom.description}",
+            "description": description,
+        }
+        if self.step:
+            out["steps"]=self.step
+        if self.names:
+            out["mappings"] = [
+                {
+                    "{k}": v
+                } for k, v in self.names.items()]
+        return out 
 
 @dataclass
 class Editor:
@@ -78,3 +121,9 @@ class Editor:
 
     def __str__(self):
         return "; ".join([f"{r}" for r in self.ranges])
+
+    def json(self):
+        return {
+            "id": self.id,
+            "ranges": [r.json() for r in self.ranges]
+        }

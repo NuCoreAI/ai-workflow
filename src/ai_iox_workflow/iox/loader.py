@@ -287,6 +287,27 @@ if __name__ == "__main__":
         required=False,
         help="Path to the nodes XML file (nodes.xml)",
     )
+    parser.add_argument(
+        "--url",
+        dest="url",
+        type=str,
+        required=False,
+        help="The URL to fetch nodes and profiles from the nucore platform",
+    )
+    parser.add_argument(
+        "--url",
+        dest="username",
+        type=str,
+        required=False,
+        help="The username to authenticate with the nucore platform",
+    )
+    parser.add_argument(
+        "--url",
+        dest="password",
+        type=str,
+        required=False,
+        help="The password to authenticate with the nucore platform",
+    )
 
     args = parser.parse_args()
 
