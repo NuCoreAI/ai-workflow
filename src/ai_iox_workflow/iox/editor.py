@@ -55,9 +55,43 @@ class EditorSubsetRange:
                 out[f"{s}"]= val_name
 
         return out
+    
+    def get_description(self):
+        """
+        Returns a description of the subset.
+        """
+        #desc = f"Enum of Unit {self.uom.label}"
+        desc = "Enum"
+        return desc
 
-
-
+    def get_names(self):
+        """
+        Returns a list of names for the subset.
+        """
+        names = []
+        if not self.names:
+            return names
+        # Iterate through the subset and map names
+        # to their corresponding values.
+        # If a range is specified, it will be expanded.
+        # Otherwise, it will return the individual values.
+        # Example: "0-5, 7, 9" -> ["between 0-5", "7", "9"]
+        # Example: "0-5, 7, 9" -> ["between 0-5", "7 [maps to 7]", "9 [maps to 9]"]
+        for s in self.subset.split(","):
+            s = s.strip()
+            if "-" in s:
+                # It's a range 'a-b'
+                #names.append(f"between {s}")
+                for k, v in self.names.items():
+                    names.append(f"{v} [{k}]")
+            else:
+                # Single value
+                val_name = self.names.get(s)
+                if val_name:
+                    names.append(f"{val_name} [{s}]")
+                else:
+                    names.append(s)
+        return names
 
 @dataclass
 class EditorMinMaxRange:
@@ -108,6 +142,26 @@ class EditorMinMaxRange:
                     "{k}": v
                 } for k, v in self.names.items()]
         return out 
+
+    def get_description(self):
+        """
+        Returns a description of the range.
+        """
+        desc = f"Range {self.min} to {self.max} {self.uom.label}"
+        if self.step:
+            desc += f" (step of {self.step} and precision of {self.prec if self.prec else 1})."
+
+        return desc
+    
+    def get_names(self):
+        """
+        Returns a dictionary of names for the range.
+        """
+        names = []
+        if self.names:
+            for k, v in self.names.items():
+                names.append(f"{v} [{k}]")
+        return names
 
 @dataclass
 class Editor:

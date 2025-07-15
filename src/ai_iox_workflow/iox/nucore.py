@@ -15,6 +15,7 @@ from node import TypeInfo, Property, Node
 from cmd import Command, CommandParameter
 from uom import get_uom_by_id
 from nucore_api import nucoreAPI
+from rag_formatter import RagFormatter
 
 
 logger = logging.getLogger(__name__)
@@ -364,11 +365,22 @@ class NuCore:
             return None 
         if not self.nodes:
             return  None
-        out = {
-            "devices": [node.json() for node in self.nodes]
-        }
-        return json.dumps(out)
+        return [node.json() for node in self.nodes]
+    
+    def dump_json(self):
+        return json.dumps(self.json())
+    
+    def to_rag(self):
+        """Convert the nucore data to a RAG format."""
+        if not self.profile:
+            return None
+        if not self.nodes:
+            return None
+        formatter = RagFormatter(indent_str=" ", prefix="-")
+        formatter.format(self.nodes)
 
+        return formatter.get_output()
+        
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Loader for IOX Profile and Nodes XML files."
@@ -412,7 +424,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     nuCore = NuCore(profile_path=args.profile_path, nodes_path=args.nodes_path, url=args.url, username=args.username, password=args.password)
     nuCore.load()
-    print(nuCore.json())
+    print(nuCore.to_rag())
+    #print(nuCore.dump_json()
 
 
 
