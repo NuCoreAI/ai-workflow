@@ -64,3 +64,4 @@ class Node:
                 "rsp": [link for link in self.node_def.links.rsp],
             } if self.node_def and self.node_def.links else [],
         }
+    

@@ -32,8 +32,7 @@ class CommandParameter:
         }
         out["constraints"] = self.editor.json()
         return out
-
-
+    
 @dataclass
 class Command:
     """
@@ -59,3 +58,4 @@ class Command:
             "format": self.format,
             "parameters": [ p.json() for p in self.parameters]
         }
+    

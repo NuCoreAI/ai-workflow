@@ -25,7 +25,7 @@ class NodeProperty:
             "name": self.name if self.name else "none",
             "constraints": self.editor.json() if self.editor else "none"
         }
-
+    
 @dataclass
 class NodeCommands:
     """
