@@ -3,8 +3,8 @@ import re
 import requests
 import json
 import asyncio
-from ai_iox_workflow.backend.nucore_api import nucoreAPI
-from ai_iox_workflow.backend.nucore_programs import nucorePrograms
+from ai_iox_workflow.iox import nucoreAPI
+from ai_iox_workflow.iox import nucorePrograms
 
 # Local llama.cpp server
 API_URL = "http://localhost:8000/v1/chat/completions"
