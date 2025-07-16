@@ -1,8 +1,8 @@
 import textwrap
 from dataclasses import dataclass, field
-from editor import Editor
-from cmd import Command
-from linkdef import LinkDef
+from .editor import Editor
+from .cmd import Command
+from .linkdef import LinkDef
 
 
 @dataclass

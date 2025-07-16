@@ -6,16 +6,18 @@ import logging
 import argparse
 import xml.etree.ElementTree as ET
 
+
 from ai_iox_workflow.iox.loader import load_nodes
-from profile import Profile, Family, Instance
-from editor import Editor, EditorSubsetRange, EditorMinMaxRange
-from linkdef import LinkDef, LinkParameter
-from nodedef import NodeDef, NodeProperty, NodeCommands, NodeLinks
-from node import TypeInfo, Property, Node
-from cmd import Command, CommandParameter
-from uom import get_uom_by_id
-from nucore_api import nucoreAPI
-from rag_formatter import RagFormatter
+from ai_iox_workflow.iox.profile import Profile, Family, Instance
+from ai_iox_workflow.iox.editor import Editor, EditorSubsetRange, EditorMinMaxRange
+from ai_iox_workflow.iox.linkdef import LinkDef, LinkParameter
+from ai_iox_workflow.iox.nodedef import NodeDef, NodeProperty, NodeCommands, NodeLinks
+from ai_iox_workflow.iox.node import TypeInfo, Property, Node
+from ai_iox_workflow.iox.cmd import Command, CommandParameter
+from ai_iox_workflow.iox.uom import get_uom_by_id
+from ai_iox_workflow.iox.nucore_api import nucoreAPI
+from ai_iox_workflow.rag.rag_formatter import RagFormatter
+from ai_iox_workflow.rag.rag import RAGProcessor
 
 
 logger = logging.getLogger(__name__)
@@ -45,6 +47,7 @@ class NuCore:
         self.profile = None
         self.nodes = [] 
         self.lookup = {}
+        self.rag_processor = RAGProcessor()
         
     def __load_profile_from_file__(self):
         """Load profile from the specified file path."""
@@ -379,8 +382,30 @@ class NuCore:
         formatter = RagFormatter(indent_str=" ", prefix="-")
         formatter.format(self.nodes)
 
-        return formatter.get_output()
-        
+        return formatter.to_text()
+    
+    def to_rag_docs(self)->list:
+        """Convert the nucore data to a RAG format."""
+        if not self.profile:
+            return None
+        if not self.nodes:
+            return None
+        formatter = RagFormatter(indent_str=" ", prefix="-")
+        formatter.format(self.nodes)
+        return formatter.to_rag_docs()
+    
+    def embed_document(self, rag_doc:str):
+        """Embed a document using the RAGProcessor."""
+        if not rag_doc:
+            return None
+        return self.rag_processor.embed_document(rag_doc)
+
+    def embed_documents(self, rag_docs:list):
+        """Embed a document using the RAGProcessor."""
+        if not rag_docs:
+            return None
+        return self.rag_processor.embed_documents(rag_docs)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Loader for IOX Profile and Nodes XML files."
@@ -425,6 +450,14 @@ if __name__ == "__main__":
     nuCore = NuCore(profile_path=args.profile_path, nodes_path=args.nodes_path, url=args.url, username=args.username, password=args.password)
     nuCore.load()
     print(nuCore.to_rag())
+
+    docs = nuCore.to_rag_docs()
+    if docs:
+        for doc in docs:
+            print(f"{doc}")
+            nuCore.embed_document(doc['content']) 
+            #print(doc['content'])
+            print("\n---\n")
     #print(nuCore.dump_json()
 
 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from editor import Editor
+from .editor import Editor
 
 
 @dataclass

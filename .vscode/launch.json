@@ -52,7 +52,7 @@
             "name": "nucore", 
             "type": "debugpy",
             "request": "launch",
-            "program": "src/ai_iox_workflow/iox/nucore.py",
+            "program": "src/ai_iox_workflow/nucore.py",
             "console": "integratedTerminal",
             "args": [
                "--url=http://192.168.4.225:8080" ,

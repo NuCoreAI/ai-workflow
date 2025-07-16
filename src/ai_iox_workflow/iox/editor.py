@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from uom import UOMEntry, supported_uoms
+from .uom import UOMEntry, supported_uoms
 
 
 @dataclass
@@ -147,7 +147,7 @@ class EditorMinMaxRange:
         """
         Returns a description of the range.
         """
-        desc = f"Range {self.min} to {self.max} {self.uom.label}"
+        desc = f"Range {self.min} to {self.max} Unit {self.uom.label}"
         if self.step:
             desc += f" (step of {self.step} and precision of {self.prec if self.prec else 1})."
 
