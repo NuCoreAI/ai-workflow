@@ -18,9 +18,11 @@ from ai_iox_workflow.iox.uom import get_uom_by_id
 from ai_iox_workflow.iox.nucore_api import nucoreAPI
 from ai_iox_workflow.rag.rag_formatter import RagFormatter
 from ai_iox_workflow.rag.rag import RAGProcessor
+from config import AIConfig
 
 
 logger = logging.getLogger(__name__)
+config = AIConfig()
 
 class NuCoreError(Exception):
     """Base exception for nucore backend errors."""
@@ -47,7 +49,7 @@ class NuCore:
         self.profile = None
         self.nodes = [] 
         self.lookup = {}
-        self.rag_processor = RAGProcessor()
+        self.device_rag_processor = RAGProcessor(config.getCollectionNameForDevices())
         
     def __load_profile_from_file__(self):
         """Load profile from the specified file path."""
@@ -398,13 +400,30 @@ class NuCore:
         """Embed a document using the RAGProcessor."""
         if not rag_doc:
             return None
-        return self.rag_processor.embed_document(rag_doc)
+        return self.device_rag_processor.embed_document(rag_doc)
 
-    def embed_documents(self, rag_docs:list):
-        """Embed a document using the RAGProcessor."""
-        if not rag_docs:
-            return None
-        return self.rag_processor.embed_documents(rag_docs)
+    def embed_documents(self, documents:list):
+        """
+        embeds a list of documents using the embedding model
+        """
+        if not documents or not isinstance(documents, list):
+            raise ValueError("Documents must be a non-empty list")
+
+        result = {}
+        result["documents"] = []
+        result["embeddings"] = []
+        result["ids"] = []
+        result["metadatas"] = []
+
+        for doc in documents:
+            embedding = self.embed_document(doc['content'])
+            if embedding:
+                result["embeddings"].append(embedding)
+                result["documents"].append(doc['content'])
+                result["ids"].append(doc['id'])
+                result["metadatas"].append({"name": doc["id"]})
+
+        return self.device_rag_processor.add_update(result)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -452,12 +471,15 @@ if __name__ == "__main__":
     print(nuCore.to_rag())
 
     docs = nuCore.to_rag_docs()
-    if docs:
-        for doc in docs:
-            print(f"{doc}")
-            nuCore.embed_document(doc['content']) 
-            #print(doc['content'])
-            print("\n---\n")
+    embeddings = nuCore.embed_documents(docs)
+    print("x")
+
+#    if docs:
+#        for doc in docs:
+#            print(f"{doc}")
+#            nuCore.embed_document(doc['content']) 
+#            #print(doc['content'])
+#            print("\n---\n")
     #print(nuCore.dump_json()
 
 

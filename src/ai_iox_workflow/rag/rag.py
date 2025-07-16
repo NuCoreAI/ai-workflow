@@ -7,10 +7,10 @@ from ai_iox_workflow.config import AIConfig
 
 
 class RAGProcessor:
-    def __init__(self, db_path=None, base_url=None, username=None, password=None):
+    def __init__(self, collection_name, db_path=None, base_url=None, username=None, password=None):
         self.config = AIConfig()
-        self.db = chromadb.Client()
-        self.collection = self.db.create_collection("iox_rag_docs")
+        self.db = chromadb.PersistentClient(path=self.config.getCollectionPersistencePath(collection_name, db_path)) 
+        self.collection = self.db.get_or_create_collection(collection_name)
         self.username = username if username else "admin"
         self.password = password if password else "admin"
 
@@ -32,58 +32,69 @@ class RAGProcessor:
         try:
             response = requests.post(self.config.getEmbeddingURL(), headers=headers, data=json.dumps(body))
             if response.status_code != 200:
-                print(f"Error: {response.status_code} - {response.text}")
+                print(f"Error: {response.status_code} - {response.text} - data size = {len(document)}")
                 return None
-            return response.json()
+            result = response.json()
+            if "data" not in result:
+                print("No embedding found in response")
+                return None
+            data = result["data"][0]
+            if "embedding" not in data:
+                print("No embedding key in data")
+                return None
+            embedding = data["embedding"]
+            if not isinstance(embedding, list):
+                print("No embedding key in data")
+                return None
+            if len(embedding) == 0:
+                print("Embedding is empty")
+                return None
+            
+            # Convert to float if necessary
+            embedding_result = [float(x) for x in embedding]
+            return embedding_result
         
         except Exception as e:
             print(f"Error occurred: {e}")
             return None
         
-    def embed_documents(self, documents:list):
+    def add_update(self, collection_data:dict):
         """
-        embeds a list of documents using the embedding model
+            adds to the collection to the collection with its embedding and metadata
         """
-        if not documents or not isinstance(documents, list):
-            raise ValueError("Documents must be a non-empty list")
-        
-        embeddings = []
-        for doc in documents:
-            embedding = self.embed(doc)
-            if embedding:
-                embeddings.append(embedding)
-        
-        return embeddings
+        if not collection_data or not isinstance(collection_data, dict):
+            raise ValueError("Collection data must be a non-empty dictionary")
 
+        if "documents" not in collection_data or "embeddings" not in collection_data or "metadatas" not in collection_data:
+            raise ValueError("Collection data must contain 'documents', 'embeddings', and 'metadatas' keys")   
+        
+        self.collection.upsert(
+            documents=collection_data["documents"],
+            ids=collection_data.get("ids", []),
+            embeddings=collection_data["embeddings"],
+            metadatas=collection_data["metadatas"]
+        )
 
-# Example RAG-friendly documents
-#docs = [
-#    {
-#        "id": "doc1",
-#        "content": """***Device***
-#Name: Right Hue Color XY
-#ID: ZB24569_011_108
-#***Properties***
-#- Color X: Range 0.0 to 1.0 (Color, step 1.0, precision 5)
-#- Preferred Units: Enum [Kelvin, Mired]
-#"""
-#    },
-#    {
-#        "id": "doc2",
-#        "content": """***Device***
-#Name: Ecobee Thermostat
-#ID: n002_t421800120477
-#***Accepts Commands***
-#- Heat Setpoint [CLISPH]
-#    ▸ Parameter: 32–90°F by 1
-#"""
-#    }
-#]
-#
-## Embed and insert
-#collection.add(
-#    documents=[doc["content"] for doc in docs],
-#    embeddings=[model.encode(doc["content"]) for doc in docs],
-#    ids=[doc["id"] for doc in docs],
-#    metadatas=[{"name": doc["id"]} for doc in docs]
-#)
+    def query(self, query_text:str, n_results:int=5):
+        """
+        Queries the collection with the given text and returns the top n results.
+        """
+        if not query_text:
+            raise ValueError("Query text cannot be empty")
+
+        query_embedding = self.embed_document(query_text)
+        if not query_embedding:
+            print("Failed to embed query text")
+            return None
+
+        results = self.collection.query(
+            query_embeddings=query_embedding,
+            n_results=n_results
+        )
+        
+        if not results or "documents" not in results or len(results["documents"]) == 0:
+            print("No results found")
+            return None
+        
+        return results["documents"]
+
