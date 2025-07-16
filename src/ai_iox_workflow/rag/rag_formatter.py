@@ -123,6 +123,14 @@ class RagFormatter:
         if match:
             return match.group(1)
         return None
+
+    def __get_device_name__(self, line):
+        if not line:
+            return None
+        match = re.search(r"Name:\s*(\S+)", line)
+        if match:
+            return match.group(1)
+        return None
     
     def __get_device_content__(self, index:int):
         if not self.lines[index].startswith(DEVICE_SECTION_HEADER):
@@ -130,21 +138,26 @@ class RagFormatter:
         
         device_rag_content = {
             "id": "" ,
+            "name":"",
             "content": "" 
         } 
         content = self.lines[index] 
         index += 1
         device_id = "n/a"
+        device_name = "n/a"
         i = index
         for i in range(index, len(self.lines)) :
-            if self.lines[i].startswith("ID"):
+            if self.lines[i].startswith("ID:"):
                 device_id = self.__get_device_id__(self.lines[i])
+            if self.lines[i].startswith("Name:"):
+                device_name = self.__get_device_name__(self.lines[i])
             elif self.lines[i].startswith(DEVICE_SECTION_HEADER):
                 # we reached the end of this device content
                 break
             content += "\n" + self.lines[i]
 
         device_rag_content["id"] = device_id
+        device_rag_content["name"] = device_name
         device_rag_content["content"] = f'"{content}"'
         return i-1, device_rag_content
     

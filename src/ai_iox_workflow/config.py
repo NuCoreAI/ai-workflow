@@ -25,7 +25,19 @@ class AIConfig:
         self.__embedding_port__=8052
         self.__embedding_url__=f"http://{self.__embedding_host__}:{self.__embedding_port__}/v1/embeddings"
 
+        self.__collection_name_devices__ = "rag_docs_for_devices"
 
+    def getCollectionNameForDevices(self):
+        return self.__collection_name_devices__
+    
+    def getCollectionPersistencePath(self, collection_name:str, db_path:str=None):
+        """
+        Returns the path where the collection is stored.j
+        """
+        if db_path:
+            return os.path.join(db_path, collection_name, ".db")
+
+        return os.path.join(self.__data_path__, collection_name, ".db")
 
     def getProfile(self, file:str):
         if not file:
