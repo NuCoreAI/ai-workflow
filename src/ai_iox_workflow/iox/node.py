@@ -1,6 +1,6 @@
 from textwrap import indent
 from dataclasses import dataclass, field
-from nodedef import NodeDef
+from .nodedef import NodeDef
 
 
 @dataclass

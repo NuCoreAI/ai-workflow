@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
-from editor import Editor
-from linkdef import LinkDef
-from nodedef import NodeDef
+from .editor import Editor
+from .linkdef import LinkDef
+from .nodedef import NodeDef
 
 
 @dataclass

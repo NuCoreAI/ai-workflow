@@ -1,8 +1,11 @@
 # format rag 
 
-from nodedef import NodeProperty
-from cmd import Command
-from editor import Editor
+import re
+from ai_iox_workflow.iox.nodedef import NodeProperty
+from ai_iox_workflow.iox.cmd import Command
+from ai_iox_workflow.iox.editor import Editor
+
+DEVICE_SECTION_HEADER="***Device***"
 
 class RagFormatter:
     def __init__(self, indent_str: str = "    ", prefix: str = ""):
@@ -110,5 +113,53 @@ class RagFormatter:
             self.format_node(node)
 
 
-    def get_output(self) -> str:
+    def to_text(self) -> str:
         return "\n".join(self.lines)
+    
+    def __get_device_id__(self, line):
+        if not line:
+            return None
+        match = re.search(r"ID:\s*(\S+)", line)
+        if match:
+            return match.group(1)
+        return None
+    
+    def __get_device_content__(self, index:int):
+        if not self.lines[index].startswith(DEVICE_SECTION_HEADER):
+            return None 
+        
+        device_rag_content = {
+            "id": "" ,
+            "content": "" 
+        } 
+        content = self.lines[index] 
+        index += 1
+        device_id = "n/a"
+        i = index
+        for i in range(index, len(self.lines)) :
+            if self.lines[i].startswith("ID"):
+                device_id = self.__get_device_id__(self.lines[i])
+            elif self.lines[i].startswith(DEVICE_SECTION_HEADER):
+                # we reached the end of this device content
+                break
+            content += "\n" + self.lines[i]
+
+        device_rag_content["id"] = device_id
+        device_rag_content["content"] = f'"{content}"'
+        return i-1, device_rag_content
+    
+    
+    def to_rag_docs(self) -> list:
+        rag_docs = []
+        i = 0
+        # Iterate through the lines to find device sections
+        # and extract their content
+        while i < len(self.lines):
+            if self.lines[i].startswith(DEVICE_SECTION_HEADER):
+                i, device_content = self.__get_device_content__(i)
+                if device_content:
+                    rag_docs.append(device_content)
+            i += 1
+               
+        return rag_docs
+
