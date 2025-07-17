@@ -68,7 +68,7 @@ class RAGProcessor:
         if "documents" not in collection_data or "embeddings" not in collection_data or "metadatas" not in collection_data:
             raise ValueError("Collection data must contain 'documents', 'embeddings', and 'metadatas' keys")  
 
-        if len(collection_data["documents"]) == 0 or len(collection_data["embeddings"] == 0) or len(collection_data["ids"])== 0:
+        if len(collection_data["documents"]) == 0 or len(collection_data["embeddings"]) == 0 or len(collection_data["ids"])== 0:
             print("Nothing changed ... ")
             return 
 

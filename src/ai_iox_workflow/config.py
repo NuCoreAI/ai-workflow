@@ -16,7 +16,7 @@ class AIConfig:
         self.__ragdb_file__ = "ragdb"
         self.__llm_model__ = "qwen2.5-coder-3b.gguf" #"qwen3-1.7b",
         self.__llm_reranker_model__ = "bge-reranker-v2-m3.gguf"
-        self.__embedding_model__ = "all-miniLM-L6-v2.gguf"
+        self.__embedding_model__ = "Qwen3-Embedding-0.6B-f16.gguf"
 
         self.__model_host__="localhost"
         self.__model_port__=8013

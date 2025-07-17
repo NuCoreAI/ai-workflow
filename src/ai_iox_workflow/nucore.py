@@ -18,7 +18,7 @@ from ai_iox_workflow.iox.uom import get_uom_by_id
 from ai_iox_workflow.iox.nucore_api import nucoreAPI
 from ai_iox_workflow.rag.rag_formatter import RagFormatter
 from ai_iox_workflow.rag.rag import RAGProcessor
-from config import AIConfig
+from ai_iox_workflow.config import AIConfig
 
 
 logger = logging.getLogger(__name__)
@@ -466,6 +466,21 @@ class NuCore:
         #now compare and update the collection
         return self.compare_documents_update_collection(result)
 
+    
+    def query(self, query_text:str, n_results:int=5):
+        """
+        Queries the RAGProcessor with the given text and returns the top n results.
+        """
+        if not query_text:
+            raise ValueError("Query text cannot be empty")
+
+        results = self.device_rag_processor.query(query_text, n_results)
+        
+        if not results: 
+            print("No results found")
+            return None
+
+        return results
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -514,7 +529,14 @@ if __name__ == "__main__":
 
     docs = nuCore.to_rag_docs()
     embeddings = nuCore.embed_documents(docs)
-    print("x")
+    while True:
+        query = input("Query: ")
+        if not query:
+            print("Exiting ...")
+            break   
+        result = nuCore.query(query, 1)
+        print (result)
+
 
 #    if docs:
 #        for doc in docs:
