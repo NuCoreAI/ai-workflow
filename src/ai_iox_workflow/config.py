@@ -1,11 +1,16 @@
 #configuration file for defaults
 import os
 
+DEFAULT_NUCORE_INSTALL_DIR = "workspace/nucore"
+DEFAULT_AI_INSTALL_DIR_NAME= "ai-workflow"
+DEFAULT_AI_INSTALL_DIR = os.path.join(DEFAULT_NUCORE_INSTALL_DIR, DEFAULT_AI_INSTALL_DIR_NAME)
 
 class AIConfig:
-    def __init__(self, data_path:str=None, models_path:str=None):
-        self.__data_path__:str = data_path if data_path else "../../examples"
-        self.__models_path__:str = models_path if models_path else "../../../models"
+    def __init__(self, install_dir:str=None, data_path:str=None, models_path:str=None):
+        if not install_dir:
+            install_dir = os.path.join(os.path.expanduser('~'), DEFAULT_NUCORE_INSTALL_DIR)
+        self.__data_path__:str = data_path if data_path else os.path.join(install_dir, DEFAULT_AI_INSTALL_DIR_NAME, "examples")
+        self.__models_path__:str = models_path if models_path else os.path.join(install_dir, "models")
         self.__profile_file__ = "profile.json"
         self.__nodes_file__ = "nodes.xml"
         self.__ragdb_file__ = "ragdb"
@@ -35,9 +40,9 @@ class AIConfig:
         Returns the path where the collection is stored.j
         """
         if db_path:
-            return os.path.join(db_path, collection_name, ".db")
+            return os.path.join(db_path, f"{collection_name}_db")
 
-        return os.path.join(self.__data_path__, collection_name, ".db")
+        return os.path.join(self.__data_path__, f"{collection_name}_db")
 
     def getProfile(self, file:str):
         if not file:

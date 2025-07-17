@@ -401,6 +401,48 @@ class NuCore:
         if not rag_doc:
             return None
         return self.device_rag_processor.embed_document(rag_doc)
+    
+    def compare_documents_update_collection(self, documents:dict):
+        """
+        Compare the documents in the collection with the provided documents.
+        Returns a dictionary with added, changed, and removed IDs.
+        Those that removed or changed will be updated in the collection.
+        """
+        if not documents or not isinstance(documents, dict):
+            raise ValueError("Documents must be a non-empty list")
+        
+        results = self.device_rag_processor.compare_documents(documents)
+        if not results:
+            print("No results found in the collection")
+            return None
+        
+        #don't care about added
+        # added = results.get("added") 
+        unchanged = results.get("unchanged") 
+        removed = results.get("removed")
+
+        if removed and len(removed) > 0:
+            self.device_rag_processor.remove(removed)
+
+        result = {}
+        result["documents"] = []
+        result["embeddings"] = []
+        result["ids"] = []
+        result["metadatas"] = []
+
+        for i in range(len(documents["ids"])):
+            if i in unchanged:
+                continue
+            doc_content = documents["documents"][i]
+            embedding = self.device_rag_processor.embed_document(doc_content)
+            if embedding:
+                result["documents"].append(doc_content)
+                result["embeddings"].append(embedding)
+                result["metadatas"].append(documents["metadatas"][i])
+                result["ids"].append(documents["ids"][i])
+
+
+        return self.device_rag_processor.add_update(result)
 
     def embed_documents(self, documents:list):
         """
@@ -416,14 +458,14 @@ class NuCore:
         result["metadatas"] = []
 
         for doc in documents:
-            embedding = self.embed_document(doc['content'])
-            if embedding:
-                result["embeddings"].append(embedding)
-                result["documents"].append(doc['content'])
-                result["ids"].append(doc['id'])
-                result["metadatas"].append({"name": doc["id"]})
+            result["embeddings"].append('not embedded yet')
+            result["documents"].append(doc['content'])
+            result["ids"].append(doc['id'])
+            result["metadatas"].append({"name": doc["id"]})
 
-        return self.device_rag_processor.add_update(result)
+        #now compare and update the collection
+        return self.compare_documents_update_collection(result)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
