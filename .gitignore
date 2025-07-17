@@ -205,3 +205,7 @@ profile.json
 nodes.xml
 .DS_Store
 ui/node_modules
+
+
+#examples
+examples/
