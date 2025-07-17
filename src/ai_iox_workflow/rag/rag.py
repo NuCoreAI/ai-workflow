@@ -66,14 +66,63 @@ class RAGProcessor:
             raise ValueError("Collection data must be a non-empty dictionary")
 
         if "documents" not in collection_data or "embeddings" not in collection_data or "metadatas" not in collection_data:
-            raise ValueError("Collection data must contain 'documents', 'embeddings', and 'metadatas' keys")   
-        
-        self.collection.upsert(
+            raise ValueError("Collection data must contain 'documents', 'embeddings', and 'metadatas' keys")  
+
+        if len(collection_data["documents"]) == 0 or len(collection_data["embeddings"] == 0) or len(collection_data["ids"])== 0:
+            print("Nothing changed ... ")
+            return 
+
+
+        return self.collection.upsert(
             documents=collection_data["documents"],
             ids=collection_data.get("ids", []),
             embeddings=collection_data["embeddings"],
             metadatas=collection_data["metadatas"]
         )
+
+    def compare_documents(self, collection_data:dict):
+        """
+        Compares the collection data with the existing collection.
+        Returns a dictionary with the differences.
+        """
+        if not collection_data or not isinstance(collection_data, dict):
+            raise ValueError("Collection data must be a non-empty dictionary")
+
+        if "documents" not in collection_data or "ids" not in collection_data or "metadatas" not in collection_data:
+
+            raise ValueError("Collection data must contain 'documents', 'ids', and 'metadatas' keys")   
+
+        existing_collection = self.collection.get(ids=None, include=["documents", "metadatas"])
+        existing_ids = existing_collection.get("ids", [])
+
+        
+        new_ids = set(collection_data.get("ids", []))
+        existing_ids_set = set(existing_ids)
+        added_ids = new_ids - existing_ids_set
+        unchanged_indexes = []
+        removed_ids = existing_ids_set - new_ids
+
+        for existing_id in existing_ids:
+            existing_assets = self.collection.get(ids=[existing_id], include=["documents", "metadatas"])
+            if not existing_assets or len(existing_assets["documents"]) == 0:
+                print(f"ID {existing_id} exists in the collection but has no associated documents")
+                continue
+
+            existing_document= existing_assets["documents"][0]
+
+            index=0
+            for id in collection_data["ids"]:
+                if id == existing_id:
+                    if collection_data["documents"][index] == existing_document:
+                        unchanged_indexes.append(index)
+                        break
+                index += 1
+
+        return {
+            "added": list(added_ids),
+            "unchanged": unchanged_indexes,
+            "removed": list(removed_ids)
+        }
 
     def query(self, query_text:str, n_results:int=5):
         """
