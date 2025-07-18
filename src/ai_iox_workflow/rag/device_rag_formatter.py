@@ -2,12 +2,11 @@
 
 import re
 from ai_iox_workflow.iox.nodedef import NodeProperty
-from ai_iox_workflow.iox.cmd import Command
-from ai_iox_workflow.iox.editor import Editor
+from ai_iox_workflow.rag.rag_data_struct import RAGData
 
 DEVICE_SECTION_HEADER="***Device***"
 
-class RagFormatter:
+class DeviceRagFormatter:
     def __init__(self, indent_str: str = "    ", prefix: str = ""):
         self.lines = []
         self.level = 0
@@ -27,7 +26,7 @@ class RagFormatter:
 
     def block(self, level_increase: int = 2):
         class BlockContext:
-            def __init__(self, writer: RagFormatter):
+            def __init__(self, writer: DeviceRagFormatter):
                 self.writer = writer
 
             def __enter__(self):
@@ -132,15 +131,13 @@ class RagFormatter:
             return match.group(1)
         return None
     
-    def __get_device_content__(self, index:int):
+    def __get_device_content__(self, index:int, rag_docs:RAGData):
+        if not isinstance(rag_docs, RAGData):
+            raise ValueError("RAG data must be a non-empty dictionary")
+
         if not self.lines[index].startswith(DEVICE_SECTION_HEADER):
             return None 
         
-        device_rag_content = {
-            "id": "" ,
-            "name":"",
-            "content": "" 
-        } 
         content = self.lines[index] 
         index += 1
         device_id = "n/a"
@@ -155,23 +152,20 @@ class RagFormatter:
                 # we reached the end of this device content
                 break
             content += "\n" + self.lines[i]
+        
+        rag_docs.add_document(content, [], device_id, {"name": device_name})
 
-        device_rag_content["id"] = device_id
-        device_rag_content["name"] = device_name
-        device_rag_content["content"] = f'"{content}"'
-        return i-1, device_rag_content
+        return i-1
     
     
     def to_rag_docs(self) -> list:
-        rag_docs = []
+        rag_docs:RAGData = RAGData()
         i = 0
         # Iterate through the lines to find device sections
         # and extract their content
         while i < len(self.lines):
             if self.lines[i].startswith(DEVICE_SECTION_HEADER):
-                i, device_content = self.__get_device_content__(i)
-                if device_content:
-                    rag_docs.append(device_content)
+                i = self.__get_device_content__(i, rag_docs)
             i += 1
                
         return rag_docs

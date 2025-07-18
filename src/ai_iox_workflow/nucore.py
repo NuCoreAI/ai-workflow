@@ -16,7 +16,8 @@ from ai_iox_workflow.iox.node import TypeInfo, Property, Node
 from ai_iox_workflow.iox.cmd import Command, CommandParameter
 from ai_iox_workflow.iox.uom import get_uom_by_id
 from ai_iox_workflow.iox.nucore_api import nucoreAPI
-from ai_iox_workflow.rag.rag_formatter import RagFormatter
+from ai_iox_workflow.rag.device_rag_formatter import DeviceRagFormatter
+from ai_iox_workflow.rag.tools_rag_formatter import ToolsRAGFormatter
 from ai_iox_workflow.rag.rag import RAGProcessor
 from ai_iox_workflow.config import AIConfig
 
@@ -49,8 +50,7 @@ class NuCore:
         self.profile = None
         self.nodes = [] 
         self.lookup = {}
-        self.device_rag_processor = RAGProcessor(config.getCollectionNameForDevices())
-        
+
     def __load_profile_from_file__(self):
         """Load profile from the specified file path."""
         if not self.profile_path:
@@ -375,113 +375,27 @@ class NuCore:
     def dump_json(self):
         return json.dumps(self.json())
     
-    def to_rag(self):
+    def devices_to_rag_text(self):
         """Convert the nucore data to a RAG format."""
         if not self.profile:
             return None
         if not self.nodes:
             return None
-        formatter = RagFormatter(indent_str=" ", prefix="-")
+        formatter = DeviceRagFormatter(indent_str=" ", prefix="-")
         formatter.format(self.nodes)
 
         return formatter.to_text()
     
-    def to_rag_docs(self)->list:
+    def devices_to_rag_docs(self)->list:
         """Convert the nucore data to a RAG format."""
         if not self.profile:
             return None
         if not self.nodes:
             return None
-        formatter = RagFormatter(indent_str=" ", prefix="-")
+        formatter = DeviceRagFormatter(indent_str=" ", prefix="-")
         formatter.format(self.nodes)
         return formatter.to_rag_docs()
     
-    def embed_document(self, rag_doc:str):
-        """Embed a document using the RAGProcessor."""
-        if not rag_doc:
-            return None
-        return self.device_rag_processor.embed_document(rag_doc)
-    
-    def compare_documents_update_collection(self, documents:dict):
-        """
-        Compare the documents in the collection with the provided documents.
-        Returns a dictionary with added, changed, and removed IDs.
-        Those that removed or changed will be updated in the collection.
-        """
-        if not documents or not isinstance(documents, dict):
-            raise ValueError("Documents must be a non-empty list")
-        
-        results = self.device_rag_processor.compare_documents(documents)
-        if not results:
-            print("No results found in the collection")
-            return None
-        
-        #don't care about added
-        # added = results.get("added") 
-        unchanged = results.get("unchanged") 
-        removed = results.get("removed")
-
-        if removed and len(removed) > 0:
-            self.device_rag_processor.remove(removed)
-
-        result = {}
-        result["documents"] = []
-        result["embeddings"] = []
-        result["ids"] = []
-        result["metadatas"] = []
-
-        for i in range(len(documents["ids"])):
-            if i in unchanged:
-                continue
-            doc_content = documents["documents"][i]
-            embedding = self.device_rag_processor.embed_document(doc_content)
-            if embedding:
-                result["documents"].append(doc_content)
-                result["embeddings"].append(embedding)
-                result["metadatas"].append(documents["metadatas"][i])
-                result["ids"].append(documents["ids"][i])
-
-
-        return self.device_rag_processor.add_update(result)
-
-    def embed_documents(self, documents:list):
-        """
-        embeds a list of documents using the embedding model
-        """
-        if not documents or not isinstance(documents, list):
-            raise ValueError("Documents must be a non-empty list")
-
-        result = {}
-        result["documents"] = []
-        result["embeddings"] = []
-        result["ids"] = []
-        result["metadatas"] = []
-
-        for doc in documents:
-            result["embeddings"].append('not embedded yet')
-            result["documents"].append(doc['content'])
-            result["ids"].append(doc['id'])
-            result["metadatas"].append({"name": doc["id"]})
-
-        #now compare and update the collection
-        return self.compare_documents_update_collection(result)
-
-    
-    def query(self, query_text:str, n_results:int=5):
-        """
-        Queries the RAGProcessor with the given text and returns the top n results.
-        """
-        if not query_text:
-            raise ValueError("Query text cannot be empty")
-
-        results = self.device_rag_processor.query(query_text, n_results)
-        
-        if not results: 
-            print("No results found")
-            return None
-
-        return results
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Loader for IOX Profile and Nodes XML files."
@@ -525,16 +439,18 @@ if __name__ == "__main__":
     args = parser.parse_args()
     nuCore = NuCore(profile_path=args.profile_path, nodes_path=args.nodes_path, url=args.url, username=args.username, password=args.password)
     nuCore.load()
-    print(nuCore.to_rag())
+    device_rag_processor = RAGProcessor(config.getCollectionNameForDevices())
+    tools_rag_processor = RAGProcessor(config.getCollectionNameForTools())
+    #print(nuCore.to_rag())
 
-    docs = nuCore.to_rag_docs()
-    embeddings = nuCore.embed_documents(docs)
+    docs = nuCore.devices_to_rag_docs()
+    embeddings = device_rag_processor.compare_documents_update_collection(docs)
     while True:
         query = input("Query: ")
         if not query:
             print("Exiting ...")
             break   
-        result = nuCore.query(query, 1)
+        result = device_rag_processor.query(query, 1)
         print (result)
 
 
