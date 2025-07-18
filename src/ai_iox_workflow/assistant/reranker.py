@@ -1,6 +1,6 @@
 import json,requests,re
-API_URL = "http://localhost:8000/v1/rerank"
-
+from ai_iox_workflow.config import AIConfig
+config= AIConfig()
 
 class ToolReranker:
     def __init__(self, tools_path):
@@ -20,7 +20,7 @@ class ToolReranker:
             "query": "[QUESTION] " + query if self.is_question(query) else "[STATEMENT] " + query,
             "documents": [f"{tool['function']['name']}: {tool['function']['description']}" for tool in self.tools],
         }
-        response = requests.post(API_URL, json=payload)
+        response = requests.post(config.getRerankerURL(), json=payload)
 
         response.raise_for_status()
         if response.status_code != 200:

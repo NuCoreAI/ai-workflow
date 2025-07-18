@@ -1,0 +1,228 @@
+[
+{
+  "type": "function",
+  "function": {
+    "name": "create_automation_routine",
+    "category": "Automation and Optimization",
+    "description": "If the input asks to automate or optimize devices, the home, or specific locations based on price or comfort.  Assume utility prices are available. All devices except Bluetooth can be automated.",
+    "examples": [
+        "- Automate my Thermostat",
+        "- Optimize my lights and pool pump",
+        "- Can you automate my Batmobile based on utility prices?",
+        "- Can you optimize my Ecobee - Thermostat based on utility prices?",
+        "- Optimize my home (or house) based on utility prices",
+        "- Automate my house Room Hue based on utility prices"
+    ],
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "devices_or_locations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of devices or locations the customer wants to automate or optimize"
+        },
+        "original_input": {
+          "type": "string",
+          "description": "The full customer input, for reference and traceability"
+        }
+      },
+      "required": ["devices_or_locations", "original_input"]
+    }
+  }
+},
+{
+  "type": "function",
+  "function": {
+  "name": "utility_price_available_routine",
+  "category": "Utility Price and GHG Availability", 
+  "description": "If the input asks whether utility or energy prices or GHG signals are available.",
+  "examples": [
+    "- Are utility prices available?",
+    "- Is the GHG signal available?",
+    "- Can I get energy prices?",
+    "- Can I access utility prices?",
+    "- Do you have utility prices for my devices?",
+    "- Are utility prices available for my home?",
+    "- Can I optimize my home or devices based on utility signals?"
+  ],
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "customer_input": {
+        "type": "string",
+        "description": "The full customer input without any modifications"
+      }
+    },
+    "required": [
+      "customer_input"
+    ]
+  }
+ }
+},
+{
+  "type": "function",
+  "function": {
+  "name": "which_device_automatable",
+  "category": "Suitable Devices for Automation",
+  "description": "If the user asks which devices can be automated or optimized.",
+  "examples": [
+    "- Which devices are eligible for optimization?",
+    "- Can you list devices that can be automated?",
+    "- What devices can I optimize based on utility prices?",
+    "- Which devices can I automate based on utility prices?",
+    "- Can I optimize my batmobile based on utility prices?",
+    "- Can I optimize my thermostat (tstat) based on utility prices?",
+    "- Can I optimize my home based on utility prices?",
+    "- Can I optimize my hue based on utility prices?",
+    "- Which devices can be automated?",
+    "- Which devices can I optimize?",
+    "- Can you tell me which devices are suitable for automation?",
+    "- Are there specific devices that can be automated or optimized?"
+  ],
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "customer_input": {
+        "type": "string",
+        "description": "The full customer input without any modifications"
+      }
+    },
+    "required": [
+      "customer_input"
+    ]
+  }
+  }
+},
+{
+  "type": "function",
+  "function": {
+  "name": "general_nucore_info",
+  "category" : "IoX and NuCore and NuCore.AI Concepts and Information",
+  "description": "If the input asks about IoX or NuCore.AI concepts like plugins, editors, profiles, unit of measure (UOM), or properties. Assume IoX, NuCore, and NuCore.AI are synonymous",
+  "examples": [
+    "- What is NuCore.AI?",
+    "- Can you explain IoX?",
+    "- What are plugins in NuCore?",
+    "- How do I use the editor in IoX?",
+    "- What is a profile in NuCore.AI?",
+    "- Can you tell me about unit of measure (UOM) in IoX?",
+    "- What properties are available in NuCore?",
+    "- What are editors in NuCore?",
+    "- How do I use plugins in NuCore"
+  ],
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "customer_input": {
+        "type": "string",
+        "description": "original customer input"
+      }
+    },
+    "required": [
+      "customer_input"
+    ]
+  }
+ }
+},
+{
+  "type": "function",
+  "function": {
+  "name": "get_comfort_settings",
+  "category": "Get Comfort or Savings Settings",
+  "description": "If the user wants to retrieve their comfort or savings levels. If missing, default to Normal.",
+  "examples": [
+    "- What are my comfort settings?",
+    "- Can you tell me my savings mode?",
+    "- What is my current comfort level?",
+    "- How do I check my comfort settings?",
+    "- What is the current savings mode?",
+    "- What are my savings settings?",
+    "- What comfort levels do I have?",
+    "- What savings levels do I have?"
+  ],
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "mode": {
+        "type": "string",
+        "description": "either of savings, saving, or comfort. If not specified, defaults to comfort."
+      },
+      "customer_input": {
+        "type": "string",
+        "description": "original customer input"
+      }
+    },
+    "required": [
+      "mode", "customer_input"
+    ]
+  }
+  }
+},
+{
+  "type": "function",
+  "function": {
+  "name": "set_comfort_settings",
+  "category": "Set Comfort or Savings Settings",
+  "description": "If the user wants to set comfort or savings levels. If the level is not specified or unrecognized, default to Normal.", 
+  "examples": [
+    "- Set my comfort level to High",
+    "- Change my savings mode to Moderate",
+    "- I want to set my comfort settings to Normal",
+    "- Adjust my savings level to High",
+    "- Can you set my comfort mode to Moderate?",
+    "- Set my comfort settings to Low",
+    "- Set my comfort settings to Normal",
+    "- Set my comfort settings to Moderate",
+    "- Set my comfort settings to High",
+    "- Set my savings settings to Normal",
+    "- Set my savings settings to Moderate",
+    "- Set my savings settings to High"
+  ],
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "level": {
+        "type": "string",
+        "description": "Extracted comfort settings from the customer input: Normal, Moderate, or High. If not specified, defaults to Normal."
+      },
+      "customer_input": {
+        "type": "string",
+        "description": "original customer input"
+      }
+    },
+    "required": [
+      "level", "customer_input"
+    ]
+  }
+  }
+},
+{
+  "type": "function",
+  "function": {
+  "name": "pass_to_system",
+  "category": "Fallback to System",
+  "description": "If the question does not match any of the use cases above",
+  "examples": [
+    "- What is the weather like today?",
+    "- Can you tell me a joke?",
+    "- What is the capital of France?",
+    "- Can you help me with my homework?",
+    "- What is the meaning of life?"
+  ],
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "customer_input": {
+        "type": "string",
+        "description": "The full customer input without any modifications"
+      }
+    },
+    "required": [
+      "customer_input"
+    ]
+  }
+  }
+}
+]
