@@ -3,8 +3,11 @@ import re
 import requests
 import json
 import asyncio
-from ai_iox_workflow.iox import nucoreAPI
-from ai_iox_workflow.iox import nucorePrograms
+from ai_iox_workflow.iox.nucore_api import nucoreAPI
+from ai_iox_workflow.iox.nucore_programs import nucorePrograms
+from ai_iox_workflow.config import AIConfig
+
+config = AIConfig()
 
 # Local llama.cpp server
 API_URL = "http://localhost:8000/v1/chat/completions"
@@ -12,8 +15,12 @@ API_URL = "http://localhost:8000/v1/chat/completions"
 with open("src/ai_iox_workflow/assistant/system.prompt.qwen", "r") as f:
     system_prompt = f.read().strip()
 
-with open("src/ai_iox_workflow/assistant/tools.json", "r") as f:
-    tools = json.load(f) 
+with open(config.getToolsFile()) as f:
+    tools = json.load(f)
+    for tool in tools:
+        if "function" in tool and "examples" in tool["function"]:
+            del tool["function"]["examples"]
+
  
 generic_info_prompt="""
 You are an expert in NuCore.AI concepts and how things work. 
