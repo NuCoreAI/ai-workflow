@@ -42,6 +42,9 @@ class AIConfig:
     def getCollectionNameForDevices(self):
         return self.__collection_name_devices__
     
+    def getCollectionNameForTools(self):
+        return self.__collection_name_assistant__
+
     def getCollectionPersistencePath(self, collection_name:str, db_path:str=None):
         """
         Returns the path where the collection is stored.j

@@ -4,6 +4,7 @@ import json
 import chromadb
 import requests
 from ai_iox_workflow.config import AIConfig
+from ai_iox_workflow.rag.rag_data_struct import RAGData
 
 
 class RAGProcessor:
@@ -58,11 +59,11 @@ class RAGProcessor:
             print(f"Error occurred: {e}")
             return None
         
-    def add_update(self, collection_data:dict):
+    def add_update(self, collection_data:RAGData):
         """
             adds to the collection to the collection with its embedding and metadata
         """
-        if not collection_data or not isinstance(collection_data, dict):
+        if not collection_data or not isinstance(collection_data, RAGData):
             raise ValueError("Collection data must be a non-empty dictionary")
 
         if "documents" not in collection_data or "embeddings" not in collection_data or "metadatas" not in collection_data:
@@ -80,12 +81,12 @@ class RAGProcessor:
             metadatas=collection_data["metadatas"]
         )
 
-    def compare_documents(self, collection_data:dict):
+    def __compare_documents__(self, collection_data:RAGData):
         """
         Compares the collection data with the existing collection.
         Returns a dictionary with the differences.
         """
-        if not collection_data or not isinstance(collection_data, dict):
+        if not collection_data or not isinstance(collection_data, RAGData):
             raise ValueError("Collection data must be a non-empty dictionary")
 
         if "documents" not in collection_data or "ids" not in collection_data or "metadatas" not in collection_data:
@@ -123,6 +124,44 @@ class RAGProcessor:
             "unchanged": unchanged_indexes,
             "removed": list(removed_ids)
         }
+    
+    def compare_documents_update_collection(self, documents:RAGData):
+        """
+        Compare the documents in the collection with the provided documents.
+        Returns a dictionary with added, changed, and removed IDs.
+        Those that removed or changed will be updated in the collection.
+        """
+        if not documents or not isinstance(documents, RAGData):
+            raise ValueError("Documents must be a non-empty list")
+        
+        results = self.__compare_documents__(documents)
+        if not results:
+            print("No results found in the collection")
+            return None
+        
+        #don't care about added
+        # added = results.get("added") 
+        unchanged = results.get("unchanged") 
+        removed = results.get("removed")
+
+        if removed and len(removed) > 0:
+            self.remove(removed)
+
+        result: RAGData = RAGData() 
+
+        for i in range(len(documents["ids"])):
+            if i in unchanged:
+                continue
+            doc_content = documents["documents"][i]
+            embedding = self.embed_document(doc_content)
+            if embedding:
+                result["documents"].append(doc_content)
+                result["embeddings"].append(embedding)
+                result["metadatas"].append(documents["metadatas"][i])
+                result["ids"].append(documents["ids"][i])
+
+        return self.add_update(result)
+
 
     def query(self, query_text:str, n_results:int=5):
         """
