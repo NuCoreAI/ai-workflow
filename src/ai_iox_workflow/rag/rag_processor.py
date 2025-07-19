@@ -5,6 +5,8 @@ import chromadb
 import requests
 from ai_iox_workflow.config import AIConfig
 from ai_iox_workflow.rag.rag_data_struct import RAGData
+from ai_iox_workflow.rag.rag_formatter import RAGFormatter
+from ai_iox_workflow.rag.reranker import Reranker
 
 
 class RAGProcessor:
@@ -14,6 +16,7 @@ class RAGProcessor:
         self.collection = self.db.get_or_create_collection(collection_name)
         self.username = username if username else "admin"
         self.password = password if password else "admin"
+        self.reranker = Reranker()
 
     def embed_document(self, document:str):
         """
@@ -162,10 +165,14 @@ class RAGProcessor:
 
         return self.add_update(result)
 
-
-    def query(self, query_text:str, n_results:int=5):
+    def query(self, query_text:str, n_results:int=5, rerank=True):
         """
         Queries the collection with the given text and returns the top n results.
+        :param query_text: The text to query the collection with.
+        :param n_results: The number of results to return.
+        :param rerank: Whether to rerank the results using the Reranker.
+        :return: A dictionary with the top n results.
+        :raises ValueError: If the query text is empty.
         """
         if not query_text:
             raise ValueError("Query text cannot be empty")
@@ -183,6 +190,51 @@ class RAGProcessor:
         if not results or "documents" not in results or len(results["documents"]) == 0:
             print("No results found")
             return None
-        
-        return results["documents"]
 
+        if rerank:
+            return self.reranker.compute(query_text, results["documents"][0])
+
+        return results
+
+    def process(self, rag_docs: RAGData):
+        """
+        Process the input data, add/update/remove extra embededing and return the formatted RAG documents.
+        :param kwargs: Additional arguments for the formatter.
+        :if "dump" in kwargs and kwargs["dump"] == True, dumps the formatted data to screen or file
+        :if "dump_file_path" in kwargs, dumps the formatted data to the specified file path.
+        :return: RAG documents structured as RAGData. 
+        """
+        if not rag_docs:
+            raise ValueError("RAG documents are not set")
+
+        self.compare_documents_update_collection(rag_docs)
+        return rag_docs
+    
+    def remove(self, ids:list):
+        """
+        Removes documents from the collection by their IDs.
+        :param ids: A list of IDs to remove from the collection.
+        :return: The result of the removal operation.
+        """
+        if not ids or not isinstance(ids, list):
+            raise ValueError("IDs must be a non-empty list")
+        
+        return self.collection.delete(ids=ids)
+    
+    def dump(self):
+        """
+        Dumps the collection data to the console.
+        :return: None
+        """
+        if not self.collection:
+            print("No collection found")
+            return
+        
+        documents = self.collection.get(include=["documents", "metadatas"])
+        if not documents or "documents" not in documents or len(documents["documents"]) == 0:
+            print("No documents found in the collection")
+            return
+        
+        for i, doc in enumerate(documents["documents"]):
+            print(f"Document {i}: {doc}")
+            print(f"Metadata: {documents['metadatas'][i]}")

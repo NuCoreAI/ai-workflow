@@ -1,0 +1,86 @@
+# What is NuCore?
+***Type***: Concept  
+***Category***: NuCore, Smart Home, Automation, IoX
+
+**NuCore is synonymous with **IoX**. **IoX** stands for **ISY on Unix**. It is an open-source platform developed by Universal Devices and contributed to the NuCore.ai Foundation.  
+NuCore enables powerful integration and automation for smart homes and buildings using a **Typeless** paradigm.  
+This means that devices do not need to conform to a fixed type like Thermostat, HVAC, or Sensor, allowing more flexibility in automation and AI integration.
+
+---
+
+# Core Concepts in NuCore Typeless Architecture
+***Type***: Reference  
+***Category***: NuCore, IoX
+
+- **Node**: Any controllable or monitorable thing — physical, virtual, or software.
+- **Nodedef**: Blueprint for a Node, including properties, commands, editors.
+- **Linkdef**: Defines a link or relationship between two nodes.
+- **Properties**: Attributes of a Node (e.g., temperature, status).
+- **Commands**: Actions that can be sent to a Node.
+- **Editors**: UI components to select or enter values with constraints.
+- **Range**: Defines valid values in an editor; types include Min/Max and Subset.
+- **UOM**: Unit of Measure (e.g., °F, %, kWh).
+- **NLS**: Natural Language Support for human/AI-readable names and labels.
+- **Plugin**: A module that extends IoX by adding new NodeDefs.
+- **Store**: Centralized repository for managing plugins.
+
+---
+
+# NuCore Architecture Overview
+***Type***: Architecture  
+***Category***: NuCore, IoX
+
+- **Node**: Everything is a Node.
+- **Scene**: A group of Nodes controlled as a unit.
+- **Program**: Contains automation logic using IF/THEN/ELSE.
+- **Folder**: Used to group Nodes, Programs, and Scenes.
+- **Event Loop**: Core engine managing state, events, and execution.
+- **Fixed Point Integer**: Representation of decimal numbers as integers.
+- **Precision**: Number of decimal places implied in fixed-point values.
+
+---
+
+# NuCore Programs: Automation Logic
+***Type***: Logic  
+***Category***: Programming, Automation
+
+NuCore programs are automation routines using structured logic:
+- **If**: Entry point containing triggering conditions.
+- **Condition**: Boolean checks on nodes, values, or schedules.
+- **Schedule**: Time-based triggers.
+- **Then**: Actions executed when If is true.
+- **Else**: Optional actions if conditions are false.
+- **Action**: Executable operations like sending a command.
+- **Event**: State changes that can trigger programs.
+- **Trigger**: Initiators of execution.
+- **Wait**: Delays between actions.
+- **Random**: Introduces variability.
+- **And/Or/Paren**: Logical operators for conditions.
+- **Status**: Current state checks of nodes or properties.
+- **Comment**: Developer notes inside programs.
+- **Parent**: ID of the container (e.g., folder or higher program).
+
+---
+
+# Precision and Fixed Point Integer in NuCore
+***Type***: Explanation  
+***Category***: NuCore, Numeric Representation
+
+NuCore uses **fixed point integers** to store real numbers with precision:
+- A precision of 1 → 98.6 is stored as 986
+- A precision of 2 → 9.86 becomes 986
+- A precision of 3 → 0.986 becomes 986
+
+Precision values range from 0 to 8 and define how many decimal places are implied.
+
+---
+
+# Element-Level Details in NuCore
+***Type***: Reference  
+***Category***: NuCore, Metadata
+
+- **id**: Unique identifier for any NuCore element (property, command, etc.)
+- **name**: Short, human-readable label (e.g., “Water Level”)
+- **address**: Unique node ID string (max 20 characters, case-sensitive)
+
+---

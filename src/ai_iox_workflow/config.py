@@ -35,14 +35,10 @@ class AIConfig:
         self.__embedding_port__=8052
         self.__embedding_url__=f"http://{self.__embedding_host__}:{self.__embedding_port__}/v1/embeddings"
 
-        self.__collection_name_devices__ = "rag_docs_for_devices"
         self.__collection_name_assistant__ = "rag_docs_for_assistant"
 
 
-    def getCollectionNameForDevices(self):
-        return self.__collection_name_devices__
-    
-    def getCollectionNameForTools(self):
+    def getCollectionNameForAssistant(self):
         return self.__collection_name_assistant__
 
     def getCollectionPersistencePath(self, collection_name:str, db_path:str=None):

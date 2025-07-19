@@ -3,10 +3,11 @@
 import re
 from ai_iox_workflow.iox.nodedef import NodeProperty
 from ai_iox_workflow.rag.rag_data_struct import RAGData
+from ai_iox_workflow.rag.rag_formatter import RAGFormatter
 
 DEVICE_SECTION_HEADER="***Device***"
 
-class DeviceRagFormatter:
+class DeviceRagFormatter(RAGFormatter):
     def __init__(self, indent_str: str = "    ", prefix: str = ""):
         self.lines = []
         self.level = 0
@@ -107,10 +108,6 @@ class DeviceRagFormatter:
                 for cmd in node.node_def.cmds.sends:
                     self.add_command(cmd)
 
-    def format(self, nodes):
-        for node in nodes:
-            self.format_node(node)
-
 
     def to_text(self) -> str:
         return "\n".join(self.lines)
@@ -157,8 +154,21 @@ class DeviceRagFormatter:
 
         return i-1
     
-    
-    def to_rag_docs(self) -> list:
+    def format(self, **kwargs)->RAGData:
+        """
+        Convert the formatted devices into a list of RAG documents.
+        Each document contains an ID, name, and content.
+        :param nodes: mandatory, a list of nodes to format.
+        :return: RAGData object containing the formatted documents.
+        :raises ValueError: if no nodes are provided or if nodes is not a list. 
+        """
+        if not "nodes" in kwargs:
+            raise ValueError("No nodes provided to format")
+        if not isinstance(kwargs["nodes"], list):
+            raise ValueError("Nodes must be a list")
+        nodes = kwargs["nodes"]
+        for node in nodes:
+            self.format_node(node)
         rag_docs:RAGData = RAGData()
         i = 0
         # Iterate through the lines to find device sections
@@ -167,6 +177,5 @@ class DeviceRagFormatter:
             if self.lines[i].startswith(DEVICE_SECTION_HEADER):
                 i = self.__get_device_content__(i, rag_docs)
             i += 1
-               
+        
         return rag_docs
-
