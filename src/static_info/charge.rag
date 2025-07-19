@@ -1,0 +1,45 @@
+# Distinction Between 'Charge' (Energy vs. Payment)
+# Charge (Multiple Meanings)
+
+***Type***: Concept  
+***Category***: Language, Disambiguation, Smart Home, Energy
+
+The word "charge" has multiple meanings depending on context. Understanding the intended use is crucial for automation systems and AI tools.
+
+---
+
+## Charge (Energy)
+
+**Meaning**: To fill a battery or device with electrical energy.  
+**Context**: Electric vehicles (EVs), cars, batteries, solar storage, phones.
+
+**Examples**:
+- "Charge my car before I leave."
+- "Can I charge my vehicle using solar?"
+- "Is my battery fully charged?"
+
+---
+
+## Charge (Payment)
+
+**Meaning**: A fee or cost associated with a product or service.  
+**Context**: Billing, subscriptions, utility invoices.
+
+**Examples**:
+- "How much do you charge for setup?"
+- "There's a charge on my credit card."
+- "The charger has a monthly charge of $5."
+
+---
+
+##  Disambiguation Strategy
+
+- If surrounding words include **battery**, **car**, **automobile**, **EV**, **charging port**, treat as (Energy).
+- If surrounding words include **cost**, **fee**, **price**, treat as (Payment).
+
+Used in retrieval-augmented generation to help distinguish intent and route queries to the correct tool or service.
+
+***Examples***
+- "How much does it charge to use this charger?" : Ambiguous, depends on context.
+- "Can you charge my Tesla now?" : Energy
+- "Does this service charge extra on weekends?" : Payment

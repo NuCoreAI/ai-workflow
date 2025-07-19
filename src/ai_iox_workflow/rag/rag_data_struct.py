@@ -26,3 +26,13 @@ class RAGData(dict):
         self["embeddings"].append(embedding)
         self["ids"].append(id)
         self["metadatas"].append(metadata)
+
+    def __add__(self, other):
+        if not isinstance(other, RAGData):
+            return NotImplemented
+
+        self["documents"]  += other["documents"]
+        self["embeddings"] += other["embeddings"]
+        self["ids"] += other["ids"]
+        self["metadatas"] += other["metadatas"]
+        return self

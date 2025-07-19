@@ -18,7 +18,7 @@ from ai_iox_workflow.iox.uom import get_uom_by_id
 from ai_iox_workflow.iox.nucore_api import nucoreAPI
 from ai_iox_workflow.rag.device_rag_formatter import DeviceRagFormatter
 from ai_iox_workflow.rag.tools_rag_formatter import ToolsRAGFormatter
-from ai_iox_workflow.rag.rag import RAGProcessor
+from ai_iox_workflow.rag.rag_processor import RAGProcessor
 from ai_iox_workflow.config import AIConfig
 
 
@@ -375,27 +375,6 @@ class NuCore:
     def dump_json(self):
         return json.dumps(self.json())
     
-    def devices_to_rag_text(self):
-        """Convert the nucore data to a RAG format."""
-        if not self.profile:
-            return None
-        if not self.nodes:
-            return None
-        formatter = DeviceRagFormatter(indent_str=" ", prefix="-")
-        formatter.format(self.nodes)
-
-        return formatter.to_text()
-    
-    def devices_to_rag_docs(self)->list:
-        """Convert the nucore data to a RAG format."""
-        if not self.profile:
-            return None
-        if not self.nodes:
-            return None
-        formatter = DeviceRagFormatter(indent_str=" ", prefix="-")
-        formatter.format(self.nodes)
-        return formatter.to_rag_docs()
-    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Loader for IOX Profile and Nodes XML files."
@@ -439,20 +418,37 @@ if __name__ == "__main__":
     args = parser.parse_args()
     nuCore = NuCore(profile_path=args.profile_path, nodes_path=args.nodes_path, url=args.url, username=args.username, password=args.password)
     nuCore.load()
-    device_rag_processor = RAGProcessor(config.getCollectionNameForDevices())
-    tools_rag_processor = RAGProcessor(config.getCollectionNameForTools())
-    #print(nuCore.to_rag())
+    rag_processor = RAGProcessor(config.getCollectionNameForAssistant())
 
-    docs = nuCore.devices_to_rag_docs()
-    embeddings = device_rag_processor.compare_documents_update_collection(docs)
+
+    device_rag_formatter = DeviceRagFormatter(indent_str=" ", prefix="-")
+    device_rag_docs = device_rag_formatter.format(nodes=nuCore.nodes) 
+    #if device_rag_docs :
+    #    device_rag_formatter.dump(device_rag_docs)
+    
+    tools_rag_formatter = ToolsRAGFormatter(indent_str=" ", prefix="-")
+    tools_rag_docs =tools_rag_formatter.format(tools_path=config.getToolsFile())
+
+    #if tools_rag_docs:
+    #    tools_rag_formatter.dump(tools_rag_docs)
+    rag_processor.dump()
+
+    all_docs = device_rag_docs + tools_rag_docs
+
+    processed_docs = rag_processor.process(all_docs)
     while True:
         query = input("Query: ")
         if not query:
             print("Exiting ...")
-            break   
-        result = device_rag_processor.query(query, 1)
-        print (result)
+            break  
+        query_results = rag_processor.query(query, 5) 
+        #device_docs_results = device_rag_processor.query(query, 5)
 
+        if query_results:
+            print("\n\n*********************Query Results:********************\n\n")
+            for result in query_results:
+                index=result["index"] 
+                print(f"- {index}: {result["relevance_score"]} - {processed_docs["documents"][index]} \n******\n")
 
 #    if docs:
 #        for doc in docs:
