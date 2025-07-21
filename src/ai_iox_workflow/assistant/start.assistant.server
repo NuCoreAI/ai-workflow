@@ -1,6 +1,0 @@
-#!/usr/bin/bash
-cd ~/workspace/nucore/llama.cpp
-build.blis/bin/llama-server --jinja  -m ../models/qwen2.5-coder-3b.gguf -c 0 --port 8000 --temp 0.2
-
-
-

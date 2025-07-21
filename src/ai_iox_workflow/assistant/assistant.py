@@ -2,10 +2,12 @@ import re
 
 import requests
 import json
-import asyncio
+import asyncio, argparse
 from ai_iox_workflow.iox.nucore_api import nucoreAPI
 from ai_iox_workflow.iox.nucore_programs import nucorePrograms
 from ai_iox_workflow.config import AIConfig
+from ai_iox_workflow.nucore import NuCore
+
 
 config = AIConfig()
 
@@ -22,22 +24,26 @@ with open(config.getToolsFile()) as f:
             del tool["function"]["examples"]
 
  
-generic_info_prompt="""
-You are an expert in NuCore.AI concepts and how things work. 
-First, retrieve document iox.concepts.txt and make sure you fully understand all the concepts.
-Then, analyze the customer input below and respond accordingly.
-"""
-
 comfort_settings="""
      Normal: for price between 30 cents and 49 cents
      Moderate: for price between 50 cents and 79 cents 
      High: for price above 80 cents""" 
 
 
-class nucoreAssistant:
-    def __init__(self, websocket):
+class NuCoreAssistant:
+    def __init__(self, args, websocket=None):
         self.websocket=websocket
         self.sent_system_prompt=False
+        if not args:
+            raise ValueError("Arguments are required to initialize NuCoreAssistant")
+        self.nuCore = NuCore(
+            profile_path=args.profile_path,
+            nodes_path=args.nodes_path,
+            url=args.url,
+            username=args.username,
+            password=args.password
+        )
+        self.nuCore.load()
 
     async def utility_price_available_routine(self, customer_input:str):
         await self.send_response("Yes, you have an OpenADR 3.0 VEN service that offers both price and GHG signals!", True)
@@ -108,10 +114,20 @@ class nucoreAssistant:
         else:
             print(f"Assistant: {message}")
 
-    async def process_customer_input(self, CUSTOMER_INPUT:str, AVAILABLE_NODES:list):
-        messages =[]
+    async def process_customer_input(self, query:str, num_rag_results=5, rerank=True):
+        """
+        Process the customer input by sending it to the AI model and handling the response.
+        :param query: The customer input to process.
+        :param num_rag_results: The number of RAG results to use for the actual query
+        :param rerank: Whether to rerank the results.
+        """
 
-        system_message = {
+        if not query:
+            print("No query provided, exiting ...")
+        messages =[]
+        system_messages = []
+        
+        system_messages.append({
                 "role": "system",
                 "content": [
                     {
@@ -119,20 +135,41 @@ class nucoreAssistant:
                         "text": system_prompt 
                     }
                 ]
-        }
+        })
+
+        #first use rag for relevant documents
+        rag_results = self.nuCore.query(query, num_rag_results, rerank)
+        if rag_results:
+            for document in rag_results['documents']:
+                system_messages.append({
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"Relevant document: {document}"
+                        }
+                    ]
+                })
+
         user_message = {
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": CUSTOMER_INPUT 
+                        "text": query 
                     }
                 ]
         }
 
-        if not self.sent_system_prompt:
-            messages.append(system_message)
-            self.sent_system_prompt = True
+        if rag_results:
+            print(f"\n\n*********************Top 5 Query Results:(Rerank = {rerank})********************\n\n")
+            for i in range(len(rag_results['ids'])):
+                print(f"{i+1}. {rag_results['ids'][i]} - {rag_results['distances'][i]} - {rag_results['relevance_scores'][i]}")
+            print("\n\n***************************************************************\n\n")
+
+    #    if not self.sent_system_prompt:
+    #        messages.append(system_messages)
+    #        self.sent_system_prompt = True
 
         messages.append(user_message)
         # Step 1: Get tool call
@@ -171,11 +208,10 @@ class nucoreAssistant:
         return None 
     
 
-async def main():
+async def main(args):
     print("Welcome to NuCore AI Assistant!")
     print("Type 'quit' to exit")
-    AVAILABLE_NODES = [ ]  # Add your actual nodes here
-    assistant = nucoreAssistant(websocket=None)  # Replace with actual websocket connection if needed
+    assistant = NuCoreAssistant(args, websocket=None)  # Replace with actual websocket connection if needed
     
     while True:
         try:
@@ -189,13 +225,53 @@ async def main():
                 print("Please enter a valid request")
                 continue
                 
-            await assistant.process_customer_input(user_input, AVAILABLE_NODES)
+            await assistant.process_customer_input(user_input)
             
         except Exception as e:
             print(f"An error occurred: {e}")
             continue
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(
+        description="Loader for NuCore Profile and Nodes XML files."
+    )
+    parser.add_argument(
+        "--profile",
+        dest="profile_path",
+        type=str,
+        required=False,
+        help="Path to the profile JSON file (profile-xxx.json)",
+    )
+    parser.add_argument(
+        "--nodes",
+        dest="nodes_path",
+        type=str,
+        required=False,
+        help="Path to the nodes XML file (nodes.xml)",
+    )
+    parser.add_argument(
+        "--url",
+        dest="url",
+        type=str,
+        required=False,
+        help="The URL to fetch nodes and profiles from the nucore platform",
+    )
+    parser.add_argument(
+        "--username",
+        dest="username",
+        type=str,
+        required=False,
+        help="The username to authenticate with the nucore platform",
+    )
+    parser.add_argument(
+        "--password",
+        dest="password",
+        type=str,
+        required=False,
+        help="The password to authenticate with the nucore platform",
+    )
+
+    args = parser.parse_args()
+    asyncio.run(main(args))
 
     

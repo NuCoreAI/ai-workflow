@@ -51,6 +51,7 @@ class NuCore:
         self.profile = None
         self.nodes = [] 
         self.lookup = {}
+        self.rag_processor = RAGProcessor(config.getCollectionNameForAssistant())
 
     def __load_profile_from_file__(self):
         """Load profile from the specified file path."""
@@ -285,7 +286,29 @@ class NuCore:
         
         return Editor(id=edict["id"], ranges=ranges)
 
+    def load_rag_docs(self, **kwargs):
+        device_rag_formatter = DeviceRagFormatter(indent_str=" ", prefix="-")
+        device_rag_docs = device_rag_formatter.format(nodes=self.nodes) 
+        #if device_rag_docs :
+        #    device_rag_formatter.dump(device_rag_docs)
         
+        tools_rag_formatter = ToolsRAGFormatter(indent_str=" ", prefix="-")
+        tools_rag_docs =tools_rag_formatter.format(tools_path=config.getToolsFile())
+
+        #now get the static info
+        static_info_rag_formatter = StaticInfoRAGFormatter(indent_str=" ", prefix="-")
+        static_info_rag_docs = static_info_rag_formatter.format(static_info_path=config.getStaticInfoPath())
+
+        #if tools_rag_docs:
+        #    tools_rag_formatter.dump(tools_rag_docs)
+
+        all_docs = device_rag_docs + tools_rag_docs + static_info_rag_docs
+
+        processed_docs = self.rag_processor.process(all_docs)
+        if "dump" in kwargs and kwargs["dump"] is True:
+            self.rag_processor.dump()
+        return processed_docs
+
     def load(self):
         if not self.load_profile():
             return None
@@ -357,7 +380,24 @@ class NuCore:
 
             self.nodes.append(node)
 
-        return self.nodes
+        self.nodes
+        return self.load_rag_docs(dump=True)
+        
+    def query(self, query_text:str, num_results=5, rerank=True):
+        """
+        Query the loaded nodes and profiles using the RAG processor.
+        :param query_text: The query string to search for.
+        :param num_results: The number of results to return. Default is 5.
+        :param rerank: Whether to rerank the results based on relevance. Default is True.
+        :return: RAGData object containing the results.
+        :raises NuCoreError: If the RAG processor is not initialized.
+        :raises NuCoreError: If the query fails. 
+        """
+        if not self.rag_processor:
+            raise NuCoreError("RAG processor is not initialized.")
+        
+        return self.rag_processor.query(query_text, num_results, rerank=rerank)
+
 
     def __str__(self):
         if not self.profile:
@@ -376,93 +416,5 @@ class NuCore:
     def dump_json(self):
         return json.dumps(self.json())
     
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Loader for IOX Profile and Nodes XML files."
-    )
-    parser.add_argument(
-        "--profile",
-        dest="profile_path",
-        type=str,
-        required=False,
-        help="Path to the profile JSON file (profile-xxx.json)",
-    )
-    parser.add_argument(
-        "--nodes",
-        dest="nodes_path",
-        type=str,
-        required=False,
-        help="Path to the nodes XML file (nodes.xml)",
-    )
-    parser.add_argument(
-        "--url",
-        dest="url",
-        type=str,
-        required=False,
-        help="The URL to fetch nodes and profiles from the nucore platform",
-    )
-    parser.add_argument(
-        "--username",
-        dest="username",
-        type=str,
-        required=False,
-        help="The username to authenticate with the nucore platform",
-    )
-    parser.add_argument(
-        "--password",
-        dest="password",
-        type=str,
-        required=False,
-        help="The password to authenticate with the nucore platform",
-    )
-
-    args = parser.parse_args()
-    nuCore = NuCore(profile_path=args.profile_path, nodes_path=args.nodes_path, url=args.url, username=args.username, password=args.password)
-    nuCore.load()
-    rag_processor = RAGProcessor(config.getCollectionNameForAssistant())
-
-
-    device_rag_formatter = DeviceRagFormatter(indent_str=" ", prefix="-")
-    device_rag_docs = device_rag_formatter.format(nodes=nuCore.nodes) 
-    #if device_rag_docs :
-    #    device_rag_formatter.dump(device_rag_docs)
-    
-    tools_rag_formatter = ToolsRAGFormatter(indent_str=" ", prefix="-")
-    tools_rag_docs =tools_rag_formatter.format(tools_path=config.getToolsFile())
-
-    #now get the static info
-    static_info_rag_formatter = StaticInfoRAGFormatter(indent_str=" ", prefix="-")
-    static_info_rag_docs = static_info_rag_formatter.format(static_info_path=config.getStaticInfoPath())
-
-    #if tools_rag_docs:
-    #    tools_rag_formatter.dump(tools_rag_docs)
-
-    all_docs = device_rag_docs + tools_rag_docs + static_info_rag_docs
-
-    processed_docs = rag_processor.process(all_docs)
-    rag_processor.dump()
-    rerank=True
-    while True:
-        query = input("Query: ")
-        if not query:
-            print("Exiting ...")
-            break  
-        query_results = rag_processor.query(query, 5, rerank=rerank) 
-        #device_docs_results = device_rag_processor.query(query, 5)
-
-        if query_results:
-            print(f"\n\n*********************Top 5 Query Results:(Rerank = {rerank})********************\n\n")
-            for i in range(len(query_results['ids'])):
-                print(f"{i+1}. {query_results['ids'][i]} - {query_results['distances'][i]} - {query_results['relevance_scores'][i]}")
-            print("\n\n***************************************************************\n\n")
-
-#    if docs:
-#        for doc in docs:
-#            print(f"{doc}")
-#            nuCore.embed_document(doc['content']) 
-#            #print(doc['content'])
-#            print("\n---\n")
-    #print(nuCore.dump_json()
-
 
 

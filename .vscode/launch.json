@@ -11,41 +11,10 @@
             "program": "src/ai_iox_workflow/assistant/assistant.py",
             "console": "integratedTerminal",
             "args": [
-               "--data-path=examples" ,
-               "--model-path=../models",
+               "--url=http://192.168.4.225:8080" ,
+               "--username=admin",
+               "--password=admin"
             ],
-            "justMyCode": false
-        },
-        {
-            "name": "workflow w/ params", 
-            "type": "debugpy",
-            "request": "launch",
-            "program": "src/ai_iox_workflow/cli.py",
-            "console": "integratedTerminal",
-            "args": [
-               "--data-path=examples" ,
-               "--model-path=../models",
-               "--profile=profile.json",
-               "--nodes=nodes.xml",
-               "--workflow-llm-model=llama-3.1-8b.gguf",
-               "--reranker-model=bge-reranker-v2-m3.gguf"
-            ],
-            "justMyCode": false
-        },
-        {
-            "name": "reranker", 
-            "type": "debugpy",
-            "request": "launch",
-            "program": "src/ai_iox_workflow/assistant/reranker.py",
-            "console": "integratedTerminal",
-            "justMyCode": false
-        },
-        {
-            "name": "workflow", 
-            "type": "debugpy",
-            "request": "launch",
-            "program": "src/ai_iox_workflow/cli.py",
-            "console": "integratedTerminal",
             "justMyCode": false
         },
         {
