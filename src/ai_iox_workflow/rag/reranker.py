@@ -20,7 +20,7 @@ class Reranker:
         """
         payload = {
             "model": "bge-reranker",
-            #"query": "[QUESTION] " + query if self.is_question(query) else "[STATEMENT] " + query,
+            "query": "[QUESTION] " + query if self.is_question(query) else "[STATEMENT] " + query,
             "query": query ,
             "documents": documents 
         }
@@ -35,3 +35,5 @@ class Reranker:
         if data:
             # Sort the 'results' list based on 'relevance_score' in descending order
             return sorted(data['results'], key=lambda x: x['relevance_score'], reverse=True)
+        
+        return None

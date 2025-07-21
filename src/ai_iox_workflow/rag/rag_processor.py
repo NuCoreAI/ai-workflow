@@ -3,6 +3,7 @@
 import json
 import chromadb
 import requests
+import numpy as np
 from ai_iox_workflow.config import AIConfig
 from ai_iox_workflow.rag.rag_data_struct import RAGData
 from ai_iox_workflow.rag.rag_formatter import RAGFormatter
@@ -53,10 +54,24 @@ class RAGProcessor:
             if len(embedding) == 0:
                 print("Embedding is empty")
                 return None
-            
+
+            return embedding 
             # Convert to float if necessary
-            embedding_result = [float(x) for x in embedding]
-            return embedding_result
+            #embedding_result = [float(x) for x in embedding]
+            # Normalize the embedding
+            embedding_result = np.array(embedding) #, dtype=np.float32)
+            normalized_embedding = embedding_result / np.linalg.norm(embedding_result)
+            if normalized_embedding is None: 
+                print("Embedding is zero, returning original embedding")
+                return embedding_result.tolist()
+            norm = round(np.linalg.norm(normalized_embedding), 5)
+            if norm < 0.98 or norm > 1.02:
+                print("Normalization failed - norm is not close to 1.0, norm: {norm}")
+
+            return normalized_embedding.tolist() 
+        except requests.exceptions.RequestException as e:
+            print(f"Request failed: {e}")
+            return None
         
         except Exception as e:
             print(f"Error occurred: {e}")
@@ -157,7 +172,7 @@ class RAGProcessor:
                 continue
             doc_content = documents["documents"][i]
             embedding = self.embed_document(doc_content)
-            if embedding:
+            if embedding is not None:
                 result["documents"].append(doc_content)
                 result["embeddings"].append(embedding)
                 result["metadatas"].append(documents["metadatas"][i])
@@ -176,6 +191,7 @@ class RAGProcessor:
         """
         if not query_text:
             raise ValueError("Query text cannot be empty")
+        query_text = f"query: {query_text.strip()}".strip()
 
         query_embedding = self.embed_document(query_text)
         if not query_embedding:
@@ -191,10 +207,46 @@ class RAGProcessor:
             print("No results found")
             return None
 
-        if rerank:
-            return self.reranker.compute(query_text, results["documents"][0])
+        print(f"\n\n*********************Top {n_results} Query Results (Before Reranker):********************\n")
+        for i in range(n_results):
+            print(f"{i+1}. {results['ids'][0][i]} - {results['distances'][0][i]} - {results['relevance_scores'][0][i] if 'relevance_scores' in results else None}")
+            i+=1
+        print("\n\n***************************************************************\n\n")
+         
 
-        return results
+        out = RAGData()
+        if rerank:
+            reranked_list = self.reranker.compute(query_text, results["documents"][0])
+            if reranked_list is None:
+                return results
+            if len(reranked_list) == 0:
+                print("Reranking returned no results")
+                return results
+            for reranked in reranked_list:
+                index = reranked["index"]
+                relevance_score = reranked["relevance_score"]
+                if index < n_results :
+                    out.add_document(
+                        results["documents"][0][index],
+                        None,
+                        results["ids"][0][index],
+                        results["metadatas"][0][index],
+                        results["distances"][0][index] if "distances" in results else None,
+                        relevance_score
+                    )
+        else:
+            for i in range(n_results):
+                out.add_document(
+                    results["documents"][0][i],
+                    None,
+                    results["ids"][0][i],
+                    results["metadatas"][0][i],
+                    results["distances"][0][i] if "distances" in results else None,
+                    results["relevance_scores"][0][i] if "relevance_scores" in results else None
+                )
+
+
+        return out
 
     def process(self, rag_docs: RAGData):
         """

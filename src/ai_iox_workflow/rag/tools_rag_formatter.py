@@ -38,7 +38,7 @@ class ToolsRAGFormatter(RAGFormatter):
             category = func.get("category", "General")
             description = func.get("description", "")
             examples = func.get("examples", [])
-            content = f"Category: {category}\n***Tool: {name}***\n\n{description}\n\n***Examples***\n"
+            content = f"***Tool: {name}***\n\nCategory: {category}\n\n{description}\n\n***Examples***\n"
             if examples:
                 content += "\n".join(f"\n{example}" for example in examples) 
             else:

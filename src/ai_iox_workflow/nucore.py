@@ -431,24 +431,25 @@ if __name__ == "__main__":
 
     #if tools_rag_docs:
     #    tools_rag_formatter.dump(tools_rag_docs)
-    rag_processor.dump()
 
     all_docs = device_rag_docs + tools_rag_docs
 
     processed_docs = rag_processor.process(all_docs)
+    rag_processor.dump()
+    rerank=True
     while True:
         query = input("Query: ")
         if not query:
             print("Exiting ...")
             break  
-        query_results = rag_processor.query(query, 5) 
+        query_results = rag_processor.query(query, 5, rerank=rerank) 
         #device_docs_results = device_rag_processor.query(query, 5)
 
         if query_results:
-            print("\n\n*********************Query Results:********************\n\n")
-            for result in query_results:
-                index=result["index"] 
-                print(f"- {index}: {result["relevance_score"]} - {processed_docs["documents"][index]} \n******\n")
+            print(f"\n\n*********************Top 5 Query Results:(Rerank = {rerank})********************\n\n")
+            for i in range(len(query_results['ids'])):
+                print(f"{i+1}. {query_results['ids'][i]} - {query_results['distances'][i]} - {query_results['relevance_scores'][i]}")
+            print("\n\n***************************************************************\n\n")
 
 #    if docs:
 #        for doc in docs:

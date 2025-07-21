@@ -14,18 +14,24 @@ class RAGData(dict):
         self["embeddings"] = []
         self["ids"] = []
         self["metadatas"] = []
+        self["distances"] = []
+        self["relevance_scores"] = []
 
-    def add_document(self, document: str, embedding: list, id: str, metadata: dict):
+    def add_document(self, document: str, embedding: list, id: str, metadata: dict, distance: float = None, relevance_score: float = None):
         """
         Adds a document, its embedding, id, and metadata to the RAG data structure.
         """
-        if not isinstance(document, str) or not isinstance(embedding, list) or not isinstance(id, str) or not isinstance(metadata, dict):
+        if not isinstance(document, str) or (not isinstance(embedding, list) and embedding is not None)  or not isinstance(id, str) or not isinstance(metadata, dict):
             raise ValueError("Invalid types for document, embedding, id, or metadata")
 
         self["documents"].append(document)
         self["embeddings"].append(embedding)
         self["ids"].append(id)
         self["metadatas"].append(metadata)
+        self["distances"].append(distance)
+        self["relevance_scores"].append(relevance_score)
+        return self
+
 
     def __add__(self, other):
         if not isinstance(other, RAGData):
@@ -35,4 +41,6 @@ class RAGData(dict):
         self["embeddings"] += other["embeddings"]
         self["ids"] += other["ids"]
         self["metadatas"] += other["metadatas"]
+        self["distances"] += other["distances"]
+        self["relevance_scores"] += other["relevance_scores"]
         return self
