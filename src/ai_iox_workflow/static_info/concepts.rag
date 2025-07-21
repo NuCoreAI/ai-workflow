@@ -6,7 +6,7 @@
 NuCore enables powerful integration and automation for smart homes and buildings using a **Typeless** paradigm.  
 This means that devices do not need to conform to a fixed type like Thermostat, HVAC, or Sensor, allowing more flexibility in automation and AI integration.
 
----
+---end chuck---
 
 # Core Concepts in NuCore Typeless Architecture
 ***Type***: Reference  
@@ -24,7 +24,7 @@ This means that devices do not need to conform to a fixed type like Thermostat, 
 - **Plugin**: A module that extends IoX by adding new NodeDefs.
 - **Store**: Centralized repository for managing plugins.
 
----
+---end chuck---
 
 # NuCore Architecture Overview
 ***Type***: Architecture  
@@ -38,7 +38,7 @@ This means that devices do not need to conform to a fixed type like Thermostat, 
 - **Fixed Point Integer**: Representation of decimal numbers as integers.
 - **Precision**: Number of decimal places implied in fixed-point values.
 
----
+---end chuck---
 
 # NuCore Programs: Automation Logic
 ***Type***: Logic  
@@ -60,7 +60,7 @@ NuCore programs are automation routines using structured logic:
 - **Comment**: Developer notes inside programs.
 - **Parent**: ID of the container (e.g., folder or higher program).
 
----
+---end chuck---
 
 # Precision and Fixed Point Integer in NuCore
 ***Type***: Explanation  
@@ -73,7 +73,7 @@ NuCore uses **fixed point integers** to store real numbers with precision:
 
 Precision values range from 0 to 8 and define how many decimal places are implied.
 
----
+---end chuck---
 
 # Element-Level Details in NuCore
 ***Type***: Reference  
@@ -83,4 +83,4 @@ Precision values range from 0 to 8 and define how many decimal places are implie
 - **name**: Short, human-readable label (e.g., “Water Level”)
 - **address**: Unique node ID string (max 20 characters, case-sensitive)
 
----
+---end chuck---

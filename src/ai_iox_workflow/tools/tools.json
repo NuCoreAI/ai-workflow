@@ -110,7 +110,10 @@
     "- Can you tell me about unit of measure (UOM) in IoX?",
     "- What properties are available in NuCore?",
     "- What are editors in NuCore?",
-    "- How do I use plugins in NuCore"
+    "- How do I use plugins in NuCore",
+    "- What is uom?",
+    "- What is UOM?",
+    "- What is unit of measure?"
   ],
   "parameters": {
     "type": "object",

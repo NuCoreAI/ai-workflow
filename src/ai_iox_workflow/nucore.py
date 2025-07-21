@@ -18,6 +18,7 @@ from ai_iox_workflow.iox.uom import get_uom_by_id
 from ai_iox_workflow.iox.nucore_api import nucoreAPI
 from ai_iox_workflow.rag.device_rag_formatter import DeviceRagFormatter
 from ai_iox_workflow.rag.tools_rag_formatter import ToolsRAGFormatter
+from ai_iox_workflow.rag.static_info_rag_formatter import StaticInfoRAGFormatter
 from ai_iox_workflow.rag.rag_processor import RAGProcessor
 from ai_iox_workflow.config import AIConfig
 
@@ -429,10 +430,14 @@ if __name__ == "__main__":
     tools_rag_formatter = ToolsRAGFormatter(indent_str=" ", prefix="-")
     tools_rag_docs =tools_rag_formatter.format(tools_path=config.getToolsFile())
 
+    #now get the static info
+    static_info_rag_formatter = StaticInfoRAGFormatter(indent_str=" ", prefix="-")
+    static_info_rag_docs = static_info_rag_formatter.format(static_info_path=config.getStaticInfoPath())
+
     #if tools_rag_docs:
     #    tools_rag_formatter.dump(tools_rag_docs)
 
-    all_docs = device_rag_docs + tools_rag_docs
+    all_docs = device_rag_docs + tools_rag_docs + static_info_rag_docs
 
     processed_docs = rag_processor.process(all_docs)
     rag_processor.dump()

@@ -1,12 +1,8 @@
-# Distinction Between 'Charge' (Energy vs. Payment)
-# Charge (Multiple Meanings)
-
+#Charge vs. Charge 
 ***Type***: Concept  
 ***Category***: Language, Disambiguation, Smart Home, Energy
 
 The word "charge" has multiple meanings depending on context. Understanding the intended use is crucial for automation systems and AI tools.
-
----
 
 ## Charge (Energy)
 
@@ -17,8 +13,6 @@ The word "charge" has multiple meanings depending on context. Understanding the 
 - "Charge my car before I leave."
 - "Can I charge my vehicle using solar?"
 - "Is my battery fully charged?"
-
----
 
 ## Charge (Payment)
 

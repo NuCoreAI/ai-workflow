@@ -60,6 +60,14 @@
                "--password=admin"
             ],
             "justMyCode": false
+        },
+        {
+            "name": "start_servers", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/ai_iox_workflow/start_servers.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }
