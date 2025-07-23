@@ -29,7 +29,7 @@ class AIConfig:
         self.__model_url__=f"http://{self.__model_host__}:{self.__model_port__}/v1/chat/completions"
         #self.__llm_model__ = "qwen2.5-coder-3b.gguf" 
         self.__llm_model__ = "phi-2.Q4_K_M.gguf"
-        self.__llm_model_params__ = "--jinja -c 0 --temp 0.0"
+        self.__llm_model_params__ = "--jinja -c 0 --temp 0.0 --cache true --cache-type kv --repeat-penalty 1.1"
         self.__llm_model_server_args__ = f"-m {os.path.join(self.__models_path__,self.__llm_model__)} --host {self.__model_host__} --port {self.__model_port__} {self.__llm_model_params__}"
 
         self.__reranker_host__="localhost"

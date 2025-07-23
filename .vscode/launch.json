@@ -31,14 +31,19 @@
             "justMyCode": false
         },
         {
-            "name": "finetune_from_examples", 
+            "name": "create device fine-tuning dataset", 
             "type": "debugpy",
             "request": "launch",
-            "program": "finetuning_data/create_ft_examples.py",
+            "program": "finetuning_data/create_device_ft_data.py",
             "console": "integratedTerminal",
-            "args": [
-                "--output_path=/tmp/nc"
-            ],
+            "justMyCode": false
+        },
+        {
+            "name": "create concepts fine-tuning dataset", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "finetuning_data/create_concepts_ft_data.py",
+            "console": "integratedTerminal",
             "justMyCode": false
         },
         {

@@ -210,3 +210,4 @@ ui/node_modules
 #examples
 examples/
 finetuning_data/old/
+finetuning_data/secrets/
