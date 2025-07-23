@@ -16,9 +16,6 @@ if not (SECRETS_DIR / "keys.py").exists():
     raise FileNotFoundError(f"Secrets file {SECRETS_DIR / 'keys.py'} does not exist. Please create it and add your OpenAI API key.")
 exec(open(SECRETS_DIR / "keys.py").read())  # This will set OPENAI_API_KEY  
 
-# Ensure the OpenAI API key is set
-if not OPENAI_API_KEY:
-    raise ValueError("OPENAI_API_KEY is not set. Please set it in finetuning_data/secrets/keys.py.")
 
 #MODEL = "gpt-4o"  # Use the latest model available
 MODEL = "gpt-4.1-mini"
