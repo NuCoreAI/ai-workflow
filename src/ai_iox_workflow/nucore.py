@@ -80,6 +80,9 @@ class NuCore:
             # Validate keys / format
             if "id" not in f:
                 debug(f"Family {fidx} missing 'id'")
+            if isinstance(f, str):
+                debug(f"Family {fidx} is a string, expected dict")
+                continue
             instances = []
             for iidx, i in enumerate(f.get("instances", [])):
                 # Build Editors for reference first
@@ -284,24 +287,40 @@ class NuCore:
                 debug(f"Range must have either min/max or subset: {rng}")
         
         return Editor(id=edict["id"], ranges=ranges)
+    
+    def format_nodes(self):
+        """
+        Format nodes for fine tuning or other purposes 
+        :return: List of formatted nodes.
+        """
+        if not self.nodes:
+            raise NuCoreError("No nodes loaded.")
+        device_rag_formatter = DeviceRagFormatter(indent_str=" ", prefix="-")
+        return device_rag_formatter.format(nodes=self.nodes) 
+    
+    def format_tools(self):
+        """
+        Format tools for fine tuning or other purposes.
+        :return: List of formatted tools.
+        """
+        if not self.profile:
+            raise NuCoreError("No profile loaded.")
+        tools_rag_formatter = ToolsRAGFormatter(indent_str=" ", prefix="-")
+        return tools_rag_formatter.format(tools_path=config.getToolsFile())
+    
+    def format_static_info(self):
+        """
+        Format static information for fine tuning or other purposes.
+        :return: List of formatted static information.
+        """
+        static_info_rag_formatter = StaticInfoRAGFormatter(indent_str=" ", prefix="-")
+        return static_info_rag_formatter.format(static_info_path=config.getStaticInfoPath())
 
     def load_rag_docs(self, **kwargs):
-        device_rag_formatter = DeviceRagFormatter(indent_str=" ", prefix="-")
-        device_rag_docs = device_rag_formatter.format(nodes=self.nodes) 
-        #if device_rag_docs :
-        #    device_rag_formatter.dump(device_rag_docs)
-        
-        tools_rag_formatter = ToolsRAGFormatter(indent_str=" ", prefix="-")
-        tools_rag_docs =tools_rag_formatter.format(tools_path=config.getToolsFile())
+        device_rag_docs = self.format_nodes()
+        tools_rag_docs = self.format_tools()
+        static_info_rag_docs = self.format_static_info()
 
-        #now get the static info
-        static_info_rag_formatter = StaticInfoRAGFormatter(indent_str=" ", prefix="-")
-        static_info_rag_docs = static_info_rag_formatter.format(static_info_path=config.getStaticInfoPath())
-
-        #if tools_rag_docs:
-        #    tools_rag_formatter.dump(tools_rag_docs)
-
-        #all_docs = device_rag_docs + tools_rag_docs + static_info_rag_docs
         all_docs = device_rag_docs + tools_rag_docs + static_info_rag_docs
 
         processed_docs = self.rag_processor.process(all_docs)
@@ -309,7 +328,17 @@ class NuCore:
             self.rag_processor.dump()
         return processed_docs
 
-    def load(self):
+    def load(self, include_rag_docs=True):
+        """
+        Load devices and profiles from the specified paths or URL.
+        """
+
+        rc = self.load_devices()
+        if include_rag_docs:
+            rc = self.load_rag_docs(dump=True)
+        return rc
+
+    def load_devices(self):
         if not self.load_profile():
             return None
         
@@ -345,17 +374,17 @@ class NuCore:
                 nodeDefId=node_def_id,
                 address=node_elem.find("./address").text,
                 name=node_elem.find("./name").text,
-                family=int(node_elem.find("./family").text),
-                hint=node_elem.find("./hint").text,
-                type=node_elem.find("./type").text,
+                family=int(node_elem.find("./family").text) if node_elem.find("./family") is not None else None,
+                hint=node_elem.find("./hint").text if node_elem.find("./hint") is not None else None,
+                type=node_elem.find("./type").text if node_elem.find("./type") is not None else None,
                 enabled=(node_elem.find("./enabled").text.lower() == "true"),
-                deviceClass=int(node_elem.find("./deviceClass").text),
-                wattage=int(node_elem.find("./wattage").text),
-                dcPeriod=int(node_elem.find("./dcPeriod").text),
-                startDelay=int(node_elem.find("./startDelay").text),
-                endDelay=int(node_elem.find("./endDelay").text),
-                pnode=node_elem.find("./pnode").text,
-                rpnode=node_elem.find("./rpnode").text
+                deviceClass=int(node_elem.find("./deviceClass").text) if node_elem.find("./deviceClass") is not None else None,
+                wattage=int(node_elem.find("./wattage").text) if node_elem.find("./wattage") is not None else None,
+                dcPeriod=int(node_elem.find("./dcPeriod").text) if node_elem.find("./dcPeriod") is not None else None,
+                startDelay=int(node_elem.find("./startDelay").text) if node_elem.find("./startDelay") is not None else None,
+                endDelay=int(node_elem.find("./endDelay").text) if node_elem.find("./endDelay") is not None else None,
+                pnode=node_elem.find("./pnode").text if node_elem.find("./pnode") is not None else None,
+                rpnode=node_elem.find("./rpnode").text 
                 if node_elem.find("./rpnode") is not None
                 else None,
                 sgid=int(node_elem.find("./sgid").text)
@@ -380,8 +409,7 @@ class NuCore:
 
             self.nodes.append(node)
 
-        self.nodes
-        return self.load_rag_docs(dump=True)
+        return self.nodes
         
     def query(self, query_text:str, num_results=5, rerank=True):
         """

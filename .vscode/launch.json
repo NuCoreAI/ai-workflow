@@ -31,6 +31,17 @@
             "justMyCode": false
         },
         {
+            "name": "finetune_from_examples", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "finetuning_data/create_ft_examples.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--output_path=/tmp/nc"
+            ],
+            "justMyCode": false
+        },
+        {
             "name": "start_servers", 
             "type": "debugpy",
             "request": "launch",
