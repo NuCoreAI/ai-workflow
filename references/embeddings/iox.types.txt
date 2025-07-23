@@ -1,0 +1,119 @@
+<iox_types>
+
+Prioritize remembering the precise definition of anything beginning with "@TYPE_" as the specific and detailed understanding of these types are crucial for correctly understanding the system and creating XML and JSON.
+
+@TYPE_TRUE_FALSE:
+- A true or false value
+
+@TYPE_NAME:
+- A human readable short descriptive name usually less than 25 characters using any UTF-8 characters (e.g., "Heat Setpoint", "Current Temperature", "Water Level", etc.)
+
+@TYPE_LABEL_ID:
+- An identifier alphanumeric text string that may also include the '_' character
+
+@TYPE_INT_ID:
+- An integer ID
+
+@TYPE_PREC:
+- The precision defines how many decimal places are implied in a fixed-point integer. It is an integer between 0 and 8, where each value represents the number of decimal places implied by the fixed-point integer.
+
+@TYPE_FIXED_POINT_INTEGER:
+- A 4-byte signed integer that represents a real number scaled by 10^precision
+- Always accompanied with a precision value
+- Represents a real number scaled by 10^precision
+- Example:
+  Fixed point integer = 72 with precision 0 represents real number 72
+  Fixed point integer = 728 with precision 1 represents real number 72.8
+  Fixed point integer = 7281 with precision 2 represents real number 72.81
+  Fixed point integer = 72810 with precision 3 represents real number 72.810
+  Fixed point integer = 728105 with precision 4 represents real number 72.8105
+  Fixed point integer = 7281050 with precision 5 represents real number 72.81050
+  Fixed point integer = 72810500 with precision 6 represents real number 72.810500
+  Fixed point integer = 728105004 with precision 7 represents real number 72.8105004
+  Fixed point integer = 7281050040 with precision 8 represents real number 72.81050040
+
+@TYPE_IOX_VALUE:
+- An IoX value has the following three attributes:
+  1) A Fixed-Point Value of type @TYPE_FIXED_POINT_INTEGER
+  2) A Precision of type @TYPE_PREC
+  3) A Unit of Measure (UOM) of @TYPE_UOM
+
+- These three attributes fully define an IoX value.
+
+- XML:
+    <val uom="@TYPE_UOM" prec="@TYPE_PREC">@TYPE_FIXED_POINT_INTEGER</val>
+
+- Examples:
+  1) Represents a value of 86 with a unit of measure 4:
+     <val uom="4" prec="0">86</val>
+
+  2) Represents a value of 72.50 with a unit of measure 51, where precision implies the decimal point:
+     <val uom="51" prec="2">7250</val>
+
+  3) Represents a value of 72.50 with a unit of measure 28, where precision implies the decimal point:
+     <val uom="28" prec="2">7250</val>
+
+@TYPE_NODEADDR:
+- An alphanumeric string, case-sensitive, also allowing spaces and '_' that uniquely identifies the IoX node within the system.
+- Maximum length is 20 characters.
+- IMPORTANT: The only source for this address is in <available_nodes> in the <address> tag for each <iox_node>
+
+@TYPE_CMD_ID:
+- A case sensitive alphanumeric identifier text string that may also include the '_' character
+- Used to identify a command
+- Maximum length is 31
+- e.g. "DON", "DOF", "CLISPH", "Start", "STOP"
+
+@TYPE_CMD_PARM_ID:
+- A case sensitive alphanumeric identifier text string that may also include the '_' character
+- May be the blank/empty string
+- Used to identify a command parameter
+- Maximum length is 31
+- e.g. "", "OL", "RR", "START_LEVEL"
+
+@TYPE_PROGRAM_ID:
+- An integer between 1 and 2048 that identifies an IoX program
+- Leading zeros (e.g., "0003") are for display; the value is stored as an integer.
+- e.g. <d2d><trigger><id>3</id><name>Program with ID #3</name><parent>1</parent><if></if><then></then><else></else><comment></comment></trigger></d2d>
+
+@TYPE_TIME:
+- <time> is specified seconds since midnight
+- <sunrise> is seconds since midnight to sunrise
+- <sunset> is seconds since midnight to sunset
+- Used primarily in IoX Program schedule conditions
+- e.g. 7:30:05AM is <time>27005</time>
+
+@TYPE_DATE:
+- A date in the form YYYY/MM/DD
+- e.g. <date>2025/02/13</date>
+- Used primarily in IoX Program schedule conditions
+
+@TYPE_COMPARE_OP:
+- A comparison operator primarily used in IoX program conditions.
+- The following is the complete set of comparison operators and are the ONLY comparison operators:
+   "IS" - Equal
+   "ISNOT" - Not Equal
+   "LT" - Less Than
+   "LE" - Less Than or Equal
+   "GT" - Greater Than
+   "GE" - Greater Than or Equal
+
+@TYPE_IOX_PROPERTY_ID:
+ - Defined in <iox.property.ids>
+ - IoX Property IDs are case sensitive and maximum 8 characters long
+ - A predefined identifier for a nodedef property, represented as an uppercase alphanumeric string of up to 8 characters. Valid values are specified in the "IoX Property IDs" section.
+ - IoX Property IDs are sometimes referred to as "Driver Controls"
+ - The meaning of some IoX property IDs is scoped to the nodedef using it
+   e.g. ST may mean temperature for a Thermostat, or Brightness for a light bulb, or Weight for a bathroom scale, etc.
+ - The meaning of some IoX property IDs is global
+   e.g. CLISPH always means Heat Setpoint, TPW always means Total Power Used, etc.
+- Examples of valid values (from the predefined list): "ST", "CLISPH", "WINDDIR"
+
+@TYPE_UOM:
+- A predefined integer ID identifying an IoX Unit of Measure. Valid values are specified in the <iox_uom>.
+- Examples of valid values (from the predefined list): 4 (celsius), 51 (percent), 72 (volts)
+
+@TYPE_EDITOR:
+- see <iox_editor>
+
+</iox_types>

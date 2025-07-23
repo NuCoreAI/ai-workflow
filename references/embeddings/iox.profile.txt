@@ -1,0 +1,36 @@
+<iox_profile>
+- A complete set of nodedefs and editors is called a profile
+- A family is a product family such as Z-Wave, Zigbee, Insteon, and others.
+- A family has an integer ID, we will call it @TYPE_FAMILY
+- An Instance is an instance of a family (e.g. a specific Z-Wave network)
+- An instance has an integer ID, we will call it @TYPE_FAMILY_INSTANCE
+- All profiles belong to (and are thus scoped to) an instance of family
+
+- JSON for profiles (with comments using C++ syntax)
+
+{
+  "timestamp": "2025-02-15T08:46:17.952550-08:00",
+  "families": [
+    {
+      "id": "@TYPE_FAMILY",
+      "name": "",
+      "instances": [
+        {
+          "id": "@TYPE_FAMILY_INSTANCE",
+          "name": "",
+          "editors": [
+           // ... all the editors
+          ],
+          "linkdefs": [
+            // ... ignore linkdefs for now
+          ],
+          "nodedefs": [
+            // ... all the nodedefs
+          ]
+        },
+        // ... More instances
+      ],
+      // ... More families
+   }
+}
+</iox_profile>

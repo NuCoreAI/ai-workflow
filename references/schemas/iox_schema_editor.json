@@ -1,0 +1,94 @@
+{
+  "description": "Editors are used to render a value or allow selection. They define allowed values through one or more ranges. Each range must have a unique UOM within the editor.  An editor is used to render a value or allow selection. It defines allowed values through one or more **range**. Each **range** must have a unique **UOM** within the editor. **range** with precision 0 can have named values (key/label pairs).",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "iox_schema_editor.json",	
+  "title": "Editor Schema",	
+  "definitions": {
+    "editor": {
+      "description": "Definition of an editor!",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The id for the editor. Id must be unique within the node definition.",
+          "type": "string"
+        },
+        "ranges": {
+          "description": "Range describes the permissible range of allowed values in an **Editor**. There are 2 types of **range**: **Min/Max**: Is a **range** that defines a continuous range with 'min', 'max', **precision**, and **step** attributes.  **Subset**: Is a **rnage** that defines a discrete set of allowed values (always with precision 0) using spans (e.g., '0-5') and individual values (e.g., '7,9') separated by commas, like '0-5,7,9,11-14'. Each entry in the 'ranges' array must have a unique 'uom' value across all subset and minmax entries, enforced by application logic beyond this schema.",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "uom": {
+                    "description": "The unit of measure for the range. This must be a valid UOM reference.",
+                    "$ref": "iox_schema_uom.json#/definitions/UOM_ref"
+                  },
+                  "subset": {
+                    "description": "A comma-separated list of integers or integer ranges (e.g., '-50--45,-15,0,1,2,3,7-16,20-25,29'). Values must be in numeric order (e.g., '10-17' is valid, '17-10' is invalid), and there must be no overlapping values (e.g., '1,2,3,3-8,9' is invalid due to overlap at '3'). The pattern enforces the syntax, but additional application logic is required to validate numeric order and non-overlap.",
+                    "type": "string",
+                    "pattern": "^(?:-?\\d+|-?\\d+--?\\d+)(?:,(?:-?\\d+|-?\\d+--?\\d+))*$"
+                  },
+                  "names": {
+                    "description": ". This is a list of possible names. For instance, for HVAC, you could have Cool Setpoint, Heat Setpoint, Fan Mode, etc. Keys should correspond to integers valid within the range or subset, considering the unit defined by uom.",
+                    "type": "object",
+                    "patternProperties": {
+                      "^-?\\d+$": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "required": ["uom", "subset"]
+              },
+              {
+                "description": "A range that defines a continuous range with 'min', 'max', precision, and step attributes.",	
+                "type": "object",
+                "properties": {
+                  "uom": {
+                    "description": "The unit of measure for the range. This must be a valid UOM reference.",	
+                    "$ref": "iox_schema_uom.json#/definitions/UOM_ref"
+                  },
+                  "min": {
+                    "description": "The minimum value of the range.",
+                    "type": "number"
+                  },
+                  "max": {
+                    "description": "The maximum value of the range.",
+                    "type": "number"
+                  },
+                  "prec": {
+                    "description": "The precision of the range. This is the number of decimal places to which the value is rounded.",	
+                    "type": "number"
+                  },
+                  "step": {
+                    "description": "The step size of the range. This is the increment between successive values in the range.",
+                    "type": "number"
+                  },
+                  "names": {
+                    "description": "Keys should correspond to integers valid within the range or subset, considering the unit defined by uom.",
+                    "type": "object",
+                    "patternProperties": {
+                      "^-?\\d+$": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "required": ["uom", "min", "max"]
+              }
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": ["id", "ranges"]
+    },
+    "editor_ref": {
+      "description": "References the 'id' field of an editor in the 'editors' array",
+      "type": "string"
+    }
+  }
+}

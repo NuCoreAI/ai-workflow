@@ -18,6 +18,7 @@ class AIConfig:
         self.__tools_path__:str = os.path.join(self.__iox_path__, "tools")
         self.__tools_name__:str = "tools.json" 
         self.__static_info_path__:str = os.path.join(self.__iox_path__, "static_info")
+        self.__assistant_path__:str = os.path.join(self.__iox_path__, "assistant")
 
         self.__profile_file__ = "profile.json"
         self.__nodes_file__ = "nodes.xml"
@@ -26,8 +27,9 @@ class AIConfig:
         self.__model_host__="localhost"
         self.__model_port__=8013
         self.__model_url__=f"http://{self.__model_host__}:{self.__model_port__}/v1/chat/completions"
-        self.__llm_model__ = "qwen2.5-coder-3b.gguf" 
-        self.__llm_model_params__ = "--jinja -c 0 --port 8000 --temp 0.0"
+        #self.__llm_model__ = "qwen2.5-coder-3b.gguf" 
+        self.__llm_model__ = "phi-2.Q4_K_M.gguf"
+        self.__llm_model_params__ = "--jinja -c 0 --temp 0.0"
         self.__llm_model_server_args__ = f"-m {os.path.join(self.__models_path__,self.__llm_model__)} --host {self.__model_host__} --port {self.__model_port__} {self.__llm_model_params__}"
 
         self.__reranker_host__="localhost"
@@ -91,7 +93,7 @@ class AIConfig:
         return os.path.join(self.__models_path__, model)
 
     def getModelURL(self):
-        return self.__model_host__ 
+        return self.__model_url__ 
 
     def getRerankerURL(self):
         return self.__reranker_url__    

@@ -3,7 +3,6 @@
 
 import json
 import logging
-import argparse
 import xml.etree.ElementTree as ET
 
 
@@ -302,6 +301,7 @@ class NuCore:
         #if tools_rag_docs:
         #    tools_rag_formatter.dump(tools_rag_docs)
 
+        #all_docs = device_rag_docs + tools_rag_docs + static_info_rag_docs
         all_docs = device_rag_docs + tools_rag_docs + static_info_rag_docs
 
         processed_docs = self.rag_processor.process(all_docs)

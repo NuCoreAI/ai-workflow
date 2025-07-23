@@ -1,0 +1,1634 @@
+{
+  "description": "This schema defines uoms in JSON format. A simpler version is in uom.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "iox_schema_uom.json",
+  "title": "Lean Unit of Measure (UOM) Schema",
+  "definitions": {
+    "UOM_ref": {
+      "description": "References the 'id' field of a uom in the 'UOM' array",
+      "type": "string"
+    },
+    "UOM": {
+      "title": "Lean Unit of Measure (UOM) Schema",
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "id": {"const": "0"},
+            "description": {"const": "The unit of measure is unknown"},
+            "label": {"const": "Unknown"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "1"},
+            "description": {"const": "Electrical current in Amperes"},
+            "label": {"const": "Amps"},
+            "name": {"const": "Amps"},
+            "categoryId": {"const": "electric_current"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "2"},
+            "description": {"const": "A boolean value where 0 = False, 1 = True"},
+            "label": {"const": "Boolean"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "3"},
+            "description": {"const": "BTU/Hour"},
+            "label": {"const": "btu/h"},
+            "name": {"const": "btu/h"},
+            "categoryId": {"const": "power"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "4"},
+            "description": {"const": "Degree of temperature in Celsius"},
+            "label": {"const": "Celsius"},
+            "name": {"const": "\u00B0C"},
+            "categoryId": {"const": "temperature"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "5"},
+            "description": {"const": "Centimeters"},
+            "label": {"const": "Centimeters"},
+            "name": {"const": "cm"},
+            "categoryId": {"const": "distance"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "6"},
+            "description": {"const": "Cubic Feet"},
+            "label": {"const": "Cubic Feet"},
+            "name": {"const": "ft\u00B3"},
+            "categoryId": {"const": "volume"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "7"},
+            "description": {"const": "Cubic Feet/Minute"},
+            "label": {"const": "cfm"},
+            "name": {"const": "cfm"},
+            "categoryId": {"const": "volume_flow"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "8"},
+            "description": {"const": "Cubic Meter"},
+            "label": {"const": "Cubic Meter"},
+            "name": {"const": "m\u00B3"},
+            "categoryId": {"const": "volume"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "9"},
+            "description": {"const": "Day of the Month"},
+            "label": {"const": "day"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "10"},
+            "description": {"const": "Duration in Days"},
+            "label": {"const": "Days"},
+            "name": {"const": "days"},
+            "categoryId": {"const": "time_duration"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "11"},
+            "description": {"const": "The position of the Deadbolt"},
+            "label": {"const": "Deadbolt Position"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "12"},
+            "description": {"const": "The number of Decibels"},
+            "label": {"const": "Decibel"},
+            "name": {"const": "dB"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "13"},
+            "description": {"const": "The number of A-weighted Decibels"},
+            "label": {"const": "dBA"},
+            "name": {"const": "dBA"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "14"},
+            "description": {"const": "Generic Degree of temperature"},
+            "label": {"const": "Degrees"},
+            "name": {"const": "\u00B0"},
+            "categoryId": {"const": "temperature"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "15"},
+            "description": {"const": "Door Lock alarm type"},
+            "label": {"const": "Door Lock Alarm"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "16"},
+            "description": {"const": "European macroseismic"},
+            "label": {"const": "European macroseismic"},
+            "name": {"const": "European macroseismic"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "17"},
+            "description": {"const": "Degree of temperature in Fahrenheit"},
+            "label": {"const": "Fahrenheit"},
+            "name": {"const": "\u00B0F"},
+            "categoryId": {"const": "temperature"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "18"},
+            "description": {"const": "Feet"},
+            "label": {"const": "Feet"},
+            "name": {"const": "feet"},
+            "categoryId": {"const": "distance"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "19"},
+            "description": {"const": "Hour on the clock"},
+            "label": {"const": "Hour"},
+            "name": {"const": "Hour"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "20"},
+            "description": {"const": "A duration in Hours"},
+            "label": {"const": "Hours"},
+            "name": {"const": "Hours"},
+            "categoryId": {"const": "time_duration"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "21"},
+            "description": {"const": "The Absolute Humidity"},
+            "label": {"const": "Absolute Humidity"},
+            "name": {"const": "Absolute Humidity"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "22"},
+            "description": {"const": "The Relative Humidity"},
+            "label": {"const": "Relative Humidity"},
+            "name": {"const": "%"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "23"},
+            "description": {"const": "Inches of Mercury (inHg)"},
+            "label": {"const": "inches of Hg"},
+            "name": {"const": "inHg"},
+            "categoryId": {"const": "pressure"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "24"},
+            "description": {"const": "Inches per hour"},
+            "label": {"const": "inches/hour"},
+            "name": {"const": "inches/hour"},
+            "categoryId": {"const": "speed"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "25"},
+            "description": {"const": "The list index of a value for a given list of values."},
+            "label": {"const": "Index"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "26"},
+            "description": {"const": "Degree of temperature in Kelvin"},
+            "label": {"const": "Kelvin"},
+            "name": {"const": "K"},
+            "categoryId": {"const": "temperature"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "27"},
+            "description": {"const": "Keyword"},
+            "label": {"const": "Keyword"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "28"},
+            "description": {"const": "Weight in Kilograms"},
+            "label": {"const": "Kilograms"},
+            "name": {"const": "kg"},
+            "categoryId": {"const": "weight"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "29"},
+            "description": {"const": "Kilovolts"},
+            "label": {"const": "Kilovolts"},
+            "name": {"const": "kV"},
+            "categoryId": {"const": "voltage"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "30"},
+            "description": {"const": "Kilowatts"},
+            "label": {"const": "Kilowatts"},
+            "name": {"const": "kW"},
+            "categoryId": {"const": "power"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "31"},
+            "description": {"const": "Kilopascals"},
+            "label": {"const": "Kilopascals"},
+            "name": {"const": "kPa"},
+            "categoryId": {"const": "pressure"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "32"},
+            "description": {"const": "Kilometers/Hour"},
+            "label": {"const": "km/h"},
+            "name": {"const": "km/h"},
+            "categoryId": {"const": "speed"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "33"},
+            "description": {"const": "Kilowatt hour"},
+            "label": {"const": "kWh"},
+            "name": {"const": "kWh"},
+            "categoryId": {"const": "energy"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "34"},
+            "description": {"const": "Liedu seismic intensity scale"},
+            "label": {"const": "Liedu"},
+            "name": {"const": "Liedu"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "35"},
+            "description": {"const": "Liter"},
+            "label": {"const": "liters"},
+            "name": {"const": "liters"},
+            "categoryId": {"const": "volume"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "36"},
+            "description": {"const": "Measure of light in lux"},
+            "label": {"const": "Lux"},
+            "name": {"const": "lux"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "37"},
+            "description": {"const": "Mercalli seismic intensity scale"},
+            "label": {"const": "Mercalli"},
+            "name": {"const": "Mercalli"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "38"},
+            "description": {"const": "Meter"},
+            "label": {"const": "Meters"},
+            "name": {"const": "meters"},
+            "categoryId": {"const": "distance"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "39"},
+            "description": {"const": "Number of Cubic Meters per Hour"},
+            "label": {"const": "Cubic Meters/Hour"},
+            "name": {"const": "m\u00B3/h"},
+            "categoryId": {"const": "volume_flow"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "40"},
+            "description": {"const": "Number of meters per second"},
+            "label": {"const": "Meters/Second"},
+            "name": {"const": "meters/sec"},
+            "categoryId": {"const": "speed"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "41"},
+            "description": {"const": "Milliamp"},
+            "label": {"const": "Milliamp"},
+            "name": {"const": "mA"},
+            "categoryId": {"const": "electric_current"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "42"},
+            "description": {"const": "Millisecond on the clock"},
+            "label": {"const": "millisecond"},
+            "name": {"const": "ms"},
+            "categoryId": {"const": "time_duration"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "43"},
+            "description": {"const": "Millivolt"},
+            "label": {"const": "Millivolt"},
+            "name": {"const": "mV"},
+            "categoryId": {"const": "voltage"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "44"},
+            "description": {"const": "Minute on the clock"},
+            "label": {"const": "Minute"},
+            "name": {"const": "minute"},
+            "categoryId": {"const": "time_duration"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "45"},
+            "description": {"const": "Duration in minutes"},
+            "label": {"const": "Minutes"},
+            "name": {"const": "minutes"},
+            "categoryId": {"const": "time_duration"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "46"},
+            "description": {"const": "Millimeters/hour"},
+            "label": {"const": "mm/hr"},
+            "name": {"const": "mm/hr"},
+            "categoryId": {"const": "speed"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "47"},
+            "description": {"const": "Month"},
+            "label": {"const": "Month"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "48"},
+            "description": {"const": "Miles/Hour"},
+            "label": {"const": "mph"},
+            "name": {"const": "mph"},
+            "categoryId": {"const": "speed"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "49"},
+            "description": {"const": "Meters per second"},
+            "label": {"const": "meters/sec"},
+            "name": {"const": "meters/sec"},
+            "categoryId": {"const": "speed"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "50"},
+            "description": {"const": "Electrical resistence in Ohms"},
+            "label": {"const": "Ohms"},
+            "name": {"const": "\u2126"},
+            "categoryId": {"const": "resistance"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "51"},
+            "description": {"const": "Percent"},
+            "label": {"const": "%"},
+            "name": {"const": "%"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "52"},
+            "description": {"const": "Weight in Pounds"},
+            "label": {"const": "lb"},
+            "name": {"const": "lb"},
+            "categoryId": {"const": "weight"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "53"},
+            "description": {"const": "Power factor"},
+            "label": {"const": "Power factor"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "54"},
+            "description": {"const": "Parts Per Million"},
+            "label": {"const": "PPM"},
+            "name": {"const": "PPM"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "55"},
+            "description": {"const": "Pulse Count"},
+            "label": {"const": "Pulse Count"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "56"},
+            "description": {"const": "The raw value used by the device"},
+            "label": {"const": "Raw"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "57"},
+            "description": {"const": "Second on a clock"},
+            "label": {"const": "second"},
+            "name": {"const": "second"},
+            "categoryId": {"const": "time_duration"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "58"},
+            "description": {"const": "Duration in seconds"},
+            "label": {"const": "seconds"},
+            "name": {"const": "seconds"},
+            "categoryId": {"const": "time_duration"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "59"},
+            "description": {"const": "Siemens per meter"},
+            "label": {"const": "Siemens/meter"},
+            "name": {"const": "Siemens/meter"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "60"},
+            "description": {"const": "Body Wave Magnitude Scale"},
+            "label": {"const": "Body Wave"},
+            "name": {"const": "M_b"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "61"},
+            "description": {"const": "Seismic activity level using the Richter Scale"},
+            "label": {"const": "Richter Scale"},
+            "name": {"const": "M_L"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "62"},
+            "description": {"const": "Moment Magnitude Scale"},
+            "label": {"const": "Moment Magnitude Scale"},
+            "name": {"const": "M_w"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "63"},
+            "description": {"const": "Surface Wave Magnitude Scale"},
+            "label": {"const": "Surface Wave"},
+            "name": {"const": "M_s"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "64"},
+            "description": {"const": "Shindo seismic activity scale"},
+            "label": {"const": "Shindo"},
+            "name": {"const": "Shindo"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "65"},
+            "description": {"const": "Reserved for future use"},
+            "label": {"const": "Reserved for future use"},
+            "name": {"const": "Reserved for future use"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "66"},
+            "description": {"const": "Heating/Cooling state of the thermostat"},
+            "label": {"const": "Heat/Cool State"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "67"},
+            "description": {"const": "Thermostat operational mode"},
+            "label": {"const": "Thermostat Mode"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "68"},
+            "description": {"const": "Thermostat fan mode"},
+            "label": {"const": ""},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "69"},
+            "description": {"const": "US Gallons"},
+            "label": {"const": "US gallons"},
+            "name": {"const": "US gallons"},
+            "categoryId": {"const": "volume"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "70"},
+            "description": {"const": "A number identifying a user"},
+            "label": {"const": "User Number"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "71"},
+            "description": {"const": "Ultraviolet Index"},
+            "label": {"const": "UV Index"},
+            "name": {"const": "UV Index"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "72"},
+            "description": {"const": "Volts"},
+            "label": {"const": "Volts"},
+            "name": {"const": "Volts"},
+            "categoryId": {"const": "voltage"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "73"},
+            "description": {"const": "Power in Watts"},
+            "label": {"const": "Watts"},
+            "name": {"const": "Watts"},
+            "categoryId": {"const": "power"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "74"},
+            "description": {"const": "Watts per square meter"},
+            "label": {"const": "Watts/m\u00B2"},
+            "name": {"const": "Watts/m\u00B2"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "75"},
+            "description": {"const": "Weekday"},
+            "label": {"const": "Weekday"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "76"},
+            "description": {"const": "A 1-360 degree clockwise Wind Direction, 0 indicates no wind"},
+            "label": {"const": "Wind Direction Degrees"},
+            "name": {"const": "\u00B0"},
+            "categoryId": {"const": "direction"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "77"},
+            "description": {"const": "Year"},
+            "label": {"const": "Year"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "78"},
+            "description": {"const": "On or off, where Off=0, On=100, Unknown=101"},
+            "label": {"const": "Off/On"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "79"},
+            "description": {"const": "Open or Closed, where Open=0, Closed=100, Unknown=101"},
+            "label": {"const": "Open/Closed"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "80"},
+            "description": {"const": "The running state of the Fan"},
+            "label": {"const": "Fan State"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "81"},
+            "description": {"const": "Fan Mode Override"},
+            "label": {"const": "Fan Mode Override"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "82"},
+            "description": {"const": "Millimeter"},
+            "label": {"const": "Millimeter"},
+            "name": {"const": "mm"},
+            "categoryId": {"const": "distance"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "83"},
+            "description": {"const": "Kilometer"},
+            "label": {"const": "Kilometer"},
+            "name": {"const": "km"},
+            "categoryId": {"const": "distance"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "84"},
+            "description": {"const": "Secure Mode"},
+            "label": {"const": "Secure Mode"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "85"},
+            "description": {"const": "Resistivity in ohm-meters"},
+            "label": {"const": "\u2126m"},
+            "name": {"const": "\u2126m"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "86"},
+            "description": {"const": "KiloOhm"},
+            "label": {"const": "K\u2126"},
+            "name": {"const": "K\u2126"},
+            "categoryId": {"const": "resistance"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "87"},
+            "description": {"const": "Cubic Meter/Cubic Meter"},
+            "label": {"const": "m\u00B3/m\u00B3"},
+            "name": {"const": "m\u00B3/m\u00B3"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "88"},
+            "description": {"const": "Water Activity"},
+            "label": {"const": "Water Activity"},
+            "name": {"const": "aw"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "89"},
+            "description": {"const": "Rotations/Minute (RPM)"},
+            "label": {"const": "RPM"},
+            "name": {"const": "RPM"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "90"},
+            "description": {"const": "Frequency in Hertz (1 hertz = one cycle per second)"},
+            "label": {"const": "Hz"},
+            "name": {"const": "Hz"},
+            "categoryId": {"const": "frequency"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "91"},
+            "description": {"const": "Degrees relative to north pole of standing eye view"},
+            "label": {"const": "Degrees North"},
+            "name": {"const": "Degrees North"},
+            "categoryId": {"const": "direction"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "92"},
+            "description": {"const": "Degrees relative to south pole of standing eye view"},
+            "label": {"const": "Degrees South"},
+            "name": {"const": "Degrees South"},
+            "categoryId": {"const": "direction"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "93"},
+            "description": {"const": "Power Management Alarm"},
+            "label": {"const": "Power Management Alarm"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "94"},
+            "description": {"const": "Appliance Alarm"},
+            "label": {"const": "Appliance Alarm"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "95"},
+            "description": {"const": "Home Health Alarm"},
+            "label": {"const": "Home Health Alarm"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "96"},
+            "description": {"const": "Volatile Organic Compound (VOC) Level"},
+            "label": {"const": "VOC Level"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "97"},
+            "description": {"const": "Barrier Status"},
+            "label": {"const": "Barrier Status"},
+            "name": {"const": "%"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "98"},
+            "description": {"const": "Insteon Thermostat Mode"},
+            "label": {"const": "Mode"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "99"},
+            "description": {"const": "Insteon Thermostat Fan Mode"},
+            "label": {"const": "Fan Mode"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "100"},
+            "description": {"const": "A Level from 0-255 (for example, the brightness of a dimmable lamp)"},
+            "label": {"const": "Level"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "101"},
+            "description": {"const": "Degree multiplied by 2"},
+            "label": {"const": "Degree X 2"},
+            "name": {"const": "Degree X 2"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "102"},
+            "description": {"const": "Kilowatt second"},
+            "label": {"const": "kWs"},
+            "name": {"const": "kWs"},
+            "categoryId": {"const": "energy"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "103"},
+            "description": {"const": "Dollars"},
+            "label": {"const": "Dollars"},
+            "name": {"const": "$"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "104"},
+            "description": {"const": "Cents"},
+            "label": {"const": "Cents"},
+            "name": {"const": "Cents"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "105"},
+            "description": {"const": "Inches"},
+            "label": {"const": "Inches"},
+            "name": {"const": "Inches"},
+            "categoryId": {"const": "distance"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "106"},
+            "description": {"const": "Millimeters per Day"},
+            "label": {"const": "Millimeters/Day"},
+            "name": {"const": "mm/day"},
+            "categoryId": {"const": "speed"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "107"},
+            "description": {"const": "Raw 1-Byte unsigned value"},
+            "label": {"const": "1 Byte (Unsigned)"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "108"},
+            "description": {"const": "Raw 2-Byte unsigned value"},
+            "label": {"const": "2 Bytes (Unsigned)"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "109"},
+            "description": {"const": "Raw 3-Byte unsigned value"},
+            "label": {"const": "3 Bytes (Unsigned)"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "110"},
+            "description": {"const": "Raw 4-Byte unsigned value"},
+            "label": {"const": "4 Bytes (Unsigned)"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "111"},
+            "description": {"const": "Raw 1-Byte signed value"},
+            "label": {"const": "1 Byte"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "112"},
+            "description": {"const": "Raw 2-Byte signed value"},
+            "label": {"const": "2 Byte"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "113"},
+            "description": {"const": "Raw 3-Byte signed value"},
+            "label": {"const": "3 Byte"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "114"},
+            "description": {"const": "Raw 4-Byte signed value"},
+            "label": {"const": "4 Byte"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "115"},
+            "description": {"const": "Most recent On style action taken for lamp control"},
+            "label": {"const": "Action"},
+            "name": {"const": ""}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "116"},
+            "description": {"const": "Miles"},
+            "label": {"const": "Miles"},
+            "name": {"const": "Miles"},
+            "categoryId": {"const": "distance"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "117"},
+            "description": {"const": "Millibars, typically used in barometric reports"},
+            "label": {"const": "Millibars"},
+            "name": {"const": "mb"},
+            "categoryId": {"const": "pressure"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "118"},
+            "description": {"const": "Hectopascals, typically used in barometric reports"},
+            "label": {"const": "Hectopascals"},
+            "name": {"const": "hPa"},
+            "categoryId": {"const": "pressure"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "119"},
+            "description": {"const": "Watt Hour"},
+            "label": {"const": "Wh"},
+            "name": {"const": "Wh"},
+            "categoryId": {"const": "energy"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "120"},
+            "description": {"const": "Inches per day"},
+            "label": {"const": "inches/day"},
+            "name": {"const": "inches/day"},
+            "categoryId": {"const": "speed"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "121"},
+            "description": {"const": "Mole per cubic meter (mol/m3)"},
+            "label": {"const": "mol/m\u00B3"},
+            "name": {"const": "mol/m\u00B3"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "122"},
+            "description": {"const": "Microgram per cubic meter (\u00B5g/m\u00B3)"},
+            "label": {"const": "\u00B5g/m\u00B3"},
+            "name": {"const": "\u00B5g/m\u00B3"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "123"},
+            "description": {"const": "Becquerel per cubic meter (bq/m\u00B3)"},
+            "label": {"const": "Bq/m\u00B3"},
+            "name": {"const": "Bq/m\u00B3"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "124"},
+            "description": {"const": "Picocuries per liter (pCi/l)"},
+            "label": {"const": "pCi/l"},
+            "name": {"const": "pCi/l"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "125"},
+            "description": {"const": "Acidity (pH)"},
+            "label": {"const": "pH"},
+            "name": {"const": "pH"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "126"},
+            "description": {"const": "Beats per Minute (bpm)"},
+            "label": {"const": "bpm"},
+            "name": {"const": "bpm"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "127"},
+            "description": {"const": "Millimeters of mercury (mmHg)"},
+            "label": {"const": "mmHg"},
+            "name": {"const": "mmHg"},
+            "categoryId": {"const": "pressure"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "128"},
+            "description": {"const": "Joule (J)"},
+            "label": {"const": "J"},
+            "name": {"const": "J"},
+            "categoryId": {"const": "energy"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "129"},
+            "description": {"const": "Body Mass Index (BMI)"},
+            "label": {"const": "BMI"},
+            "name": {"const": "BMI"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "130"},
+            "description": {"const": "Liters per hour (l/h)"},
+            "label": {"const": "l/h"},
+            "name": {"const": "l/h"},
+            "categoryId": {"const": "volume_flow"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "131"},
+            "description": {"const": "Decibel Milliwatts (dBm)"},
+            "label": {"const": "dBm"},
+            "name": {"const": "dBm"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "132"},
+            "description": {"const": "Breaths per minute (brpm)"},
+            "label": {"const": "brpm"},
+            "name": {"const": "brpm"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "133"},
+            "description": {"const": "Kilohertz (kHz)"},
+            "label": {"const": "kHz"},
+            "name": {"const": "kHz"},
+            "categoryId": {"const": "frequency"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "134"},
+            "description": {"const": "Meters per squared Seconds (m/sec2)"},
+            "label": {"const": "m/sec\u00B2"},
+            "name": {"const": "m/sec\u00B2"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "135"},
+            "description": {"const": "Volt-Amp (VA)"},
+            "label": {"const": "VA"},
+            "name": {"const": "VA"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "136"},
+            "description": {"const": "Volt-Amp Reactive"},
+            "label": {"const": "VAR"},
+            "name": {"const": "VAR"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "137"},
+            "description": {"const": "NTP Date/Time"},
+            "label": {"const": "NTP"},
+            "name": {"const": "NTP"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "138"},
+            "description": {"const": "Pound per square inch (PSI)"},
+            "label": {"const": "PSI"},
+            "name": {"const": "PSI"},
+            "categoryId": {"const": "pressure"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "139"},
+            "description": {"const": "Direction 0-360 degrees"},
+            "label": {"const": "Direction"},
+            "name": {"const": "\u00B0 Direction"},
+            "categoryId": {"const": "direction"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "140"},
+            "description": {"const": "Milligram per liter (mg/l)"},
+            "label": {"const": "mg/l"},
+            "name": {"const": "mg/l"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "141"},
+            "description": {"const": "Newton"},
+            "label": {"const": "N"},
+            "name": {"const": "N"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "142"},
+            "description": {"const": "US Gallons per second"},
+            "label": {"const": "gal/sec"},
+            "name": {"const": "gal/sec"},
+            "categoryId": {"const": "volume_flow"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "143"},
+            "description": {"const": "US Gallons per minute (gpm)"},
+            "label": {"const": "gpm"},
+            "name": {"const": "gpm"},
+            "categoryId": {"const": "volume_flow"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "144"},
+            "description": {"const": "US Gallons per hour"},
+            "label": {"const": "gal/hour"},
+            "name": {"const": "gal/hour"},
+            "categoryId": {"const": "volume_flow"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "145"},
+            "description": {"const": "Text"},
+            "label": {"const": "Text"},
+            "name": {"const": "Text"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "146"},
+            "description": {"const": "Short Notification ID"},
+            "label": {"const": "Notification ID"},
+            "name": {"const": "Notification ID"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "147"},
+            "description": {"const": "XML"},
+            "label": {"const": "XML"},
+            "name": {"const": "XML"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "148"},
+            "description": {"const": "Full Notification ID"},
+            "label": {"const": "Notification ID"},
+            "name": {"const": "Notification ID"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "149"},
+            "description": {"const": "Hue in Degrees"},
+            "label": {"const": "Hue Degree"},
+            "name": {"const": "\u00B0"},
+            "categoryId": {"const": "direction"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "150"},
+            "description": {"const": "URL data stream"},
+            "label": {"const": "URL Stream"},
+            "name": {"const": "URL Stream"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "151"},
+            "description": {"const": "Unix Timestamp (seconds since Jan 1/1970, UTC)"},
+            "label": {"const": "Unix Timestamp"},
+            "name": {"const": "Unix Timestamp"},
+            "categoryId": {"const": "time_duration"}
+          },
+          "required": ["id", "description", "label", "name", "categoryId"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "152"},
+            "description": {"const": "Mired (color temperature)"},
+            "label": {"const": "Mired"},
+            "name": {"const": "Mired"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "153"},
+            "description": {"const": "Color XY (usually a value between 0.00000 to 1.00000)"},
+            "label": {"const": "Color"},
+            "name": {"const": "Color"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "id": {"const": "154"},
+            "description": {"const": "Number of steps per second"},
+            "label": {"const": "Steps / Second"},
+            "name": {"const": "Steps / Second"}
+          },
+          "required": ["id", "description", "label", "name"],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

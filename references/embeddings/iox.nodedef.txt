@@ -1,0 +1,300 @@
+<iox_nodedef>
+- A nodedef is a node definition that fully defines the properties of a device, the commands it accepts, and the commands it sends.
+- Each property is in the 'properties' section.
+- There are two sections of commands in the 'cmds' section of the nodedef, the 'accepts' section and the 'sends' section.
+
+--- Properties ---
+ - JSON for a property:
+  {
+    "id": @TYPE_IOX_PROPERTY_ID,
+    "editor": @TYPE_EDITOR_ID,
+    "hide": @TYPE_TRUE_FALSE,
+    "name": @TYPE_NAME
+  }
+  <example>
+  "properties": [
+     {
+       "id": "ST",
+       "editor": "I_TEMP_F",
+       "name": "Current Temperature"
+     },
+     {
+       "id": "CLISPH",
+       "editor": "I_CLISPH_F",
+       "hide": false,
+       "name": "Heat Setpoint"
+     },
+     {
+       "id": "CLISPC",
+       "editor": "I_CLISPC_F",
+       "hide": false,
+       "name": "Cool Setpoint"
+     }
+  ]
+  </example>
+
+- The ID of a nodedef property must be in the @TYPE_IOX_PROPERTY_ID
+- You cannot have duplicate property IDs in a nodedef
+- It is best to use the the 'name' of the property to determine what it represents
+  e.g. One nodedef may use CLISPH for Heat setpoint and another may use GV1 for Heat Setpoint
+- The ST property ID is commonly used to represent the primary property for the nodedef
+- the 'hide' attribute indicates to the UI that it would look better if this value was not be displayed
+- the 'hide' attribute is optional and if omitted it is implied as false.
+
+--- Sends Commands ---
+- The commands in the 'sends' section are those that the device may send to the controller or other devices.
+- A sends command has no parameters
+- A sends command is made up of the following fields:
+
+  "id" :
+    - The command ID of @TYPE_LABEL_ID.
+    - Unlike properties the command ID strings are not predefined.
+    - They are usually uppercase and short e.g. "DON" is short for "Device On"
+
+  "name:
+    - The human readable name of the command
+    - Often used to determine what it represents (e.g. "Heat Setpoint", "Cool Setpoint", "Water level", "Brightness", etc.)
+
+  "format" :
+    - Ignore for now
+
+- JSON for sends command
+  {
+    "id": "@TYPE_LABEL_ID",
+    "name": "@TYPE_NAME",
+    "format": ""
+  }
+
+--- Accepts Commands ---
+- The commands in the 'accepts' section are those that the device can receive from the controller.
+- The 'init' key on a command parameter indicates the correlation between the command and a property, meaning the command can act as a 'setter' for that property.
+- The 'format' key on a command defines a custom way of rendering the command. For now, ignore it completely.
+- If the 'optional' key is set to true, the parameter can be omitted when running the command. Otherwise, it is mandatory.
+- A command may have zero or more parameters.
+
+- A command is made up of the following fields:
+
+  "id" :
+    - The command ID of @TYPE_LABEL_ID.
+    - Unlike properties, the command ID strings are not predefined.
+    - They are usually uppercase and short e.g. "DON" is short for "Device On"
+
+  "name:
+    - The human readable name of the command
+
+  "format" :
+    - Ignore for now
+
+  "parameters" :
+    - An array of zero or more command parameters
+
+- A command parameter is made up of the following fields:
+
+  "id" :
+    - The command parameter ID of @TYPE_LABEL_ID.
+    - Unlike properties, the command parameter ID strings are not predefined.
+    - One command parameter ID can be blank (i.e. "")
+
+  "name" :
+    - The human readable name of the command parameter
+    - Often implies its type (e.g. "Ramp Rate", "Heat Setpoint", etc.)
+
+  "editor" :
+    - The ID of the editor to use for this parameter for input and output
+      1) The editor is used to define the set of values available for a the parameter (e.g. for an input widget for specifying the parameter value)
+      2) The editor is used to render the parameter (e.g. for a program listing)
+
+  "init" :
+    - This field is optional.
+    - This field is used by the UI.
+    - The value specified for 'init' is the ID of a property defined in this nodedef.
+    - The value of the property identified by the 'init' is used as the initial value in the editor widget for this parameter.
+
+  "optional":
+    - A true false value specifying whether this parameter is optional (true), or mandatory (false)
+    - This field is optional (ironic).
+
+- JSON for accepts command
+  {
+    "id": "@TYPE_LABEL_ID",
+    "name": "@TYPE_NAME",
+    "format": "///${v}/ /rr// in ${v}/",
+    "parameters": [
+      {
+        "id": "@TYPE_LABEL_ID",
+        "name": "@TYPE_NAME"
+        "editor": "@TYPE_LABEL_ID",
+        "init": "@TYPE_IOX_PROPERTY_ID",
+        "optional": @TYPE_TRUE_FALSE
+      },
+      {
+        "id": "@TYPE_CMDPARM_ID",
+        "name": "@TYPE_NAME"
+        "editor": "@TYPE_LABEL_ID",
+        "init": "@TYPE_IOX_PROPERTY_ID",
+        "optional": @TYPE_TRUE_FALSE
+      }
+    ]
+  }
+
+--- nodedef example ---
+
+<example>
+"nodedefs": [
+   {
+     "id": "ZY014_1",
+     "nls": "119",
+     "properties": [
+       {
+         "id": "ST",
+         "editor": "_51_0_R_0_101_N_IX_DIM_REP",
+         "name": "Status"
+       },
+       {
+         "id": "ERR",
+         "editor": "ZY_ERR",
+         "hide": true,
+         "name": "Responding"
+       }
+     ],
+     "cmds": {
+       "sends": [
+         {
+           "id": "DON",
+           "name": "On",
+           "format": "///${v}/ /rr// in ${v}/"
+         },
+         {
+           "id": "DOF",
+           "name": "Off"
+         },
+         {
+           "id": "FDUP",
+           "name": "Fade Up",
+           "format": "/startlevel/${c}/Fade Up starting at ${v}/ /rr// in ${v}/"
+         },
+         {
+           "id": "FDDOWN",
+           "name": "Fade Down",
+           "format": "/startlevel/${c}/Fade Down starting at ${v}/ /rr// in ${v}/"
+         },
+         {
+           "id": "FDSTOP",
+           "name": "Fade Stop"
+         }
+       ],
+       "accepts": [
+         {
+           "id": "DON",
+           "name": "On",
+           "format": "///${v}/ /rr// in ${v}/",
+           "parameters": [
+             {
+               "id": "",
+               "editor": "ZY_DIM_PERCENT",
+               "init": "ST",
+               "optional": true
+             },
+             {
+               "id": "RR",
+               "editor": "ZY_RR",
+               "optional": true,
+               "name": "Fade Rate"
+             }
+           ]
+         },
+         {
+           "id": "DOF",
+           "name": "Off"
+         },
+         {
+           "id": "DFON",
+           "name": "Fast On"
+         },
+         {
+           "id": "DFOF",
+           "name": "Fast Off"
+         },
+         {
+           "id": "BRT",
+           "name": "Brighten"
+         },
+         {
+           "id": "DIM",
+           "name": "Dim"
+         },
+         {
+           "id": "FDUP",
+           "name": "Fade Up",
+           "format": "/startlevel/${c}/Fade Up starting at ${v}/ /rr// in ${v}/",
+           "parameters": [
+             {
+               "id": "STARTLEVEL",
+               "editor": "ZY_DIM_PERCENT",
+               "init": "ST",
+               "optional": true,
+               "name": "Start Level"
+             },
+             {
+               "id": "RR",
+               "editor": "ZY_RR",
+               "optional": true,
+               "name": "Fade Rate"
+             }
+           ]
+         },
+         {
+           "id": "FDDOWN",
+           "name": "Fade Down",
+           "format": "/startlevel/${c}/Fade Down starting at ${v}/ /rr// in ${v}/",
+           "parameters": [
+             {
+               "id": "STARTLEVEL",
+               "editor": "ZY_DIM_PERCENT",
+               "init": "ST",
+               "optional": true,
+               "name": "Start Level"
+             },
+             {
+               "id": "RR",
+               "editor": "ZY_RR",
+               "optional": true,
+               "name": "Fade Rate"
+             }
+           ]
+         },
+         {
+           "id": "FDSTOP",
+           "name": "Fade Stop"
+         },
+         {
+           "id": "QUERY",
+           "name": "Query"
+         },
+         {
+           "id": "CONFIG",
+           "name": "Set Configuration",
+           "format": "/num//${c} Parameter ${vo}/ /val// = ${v}/",
+           "parameters": [
+             {
+               "id": "NUM",
+               "editor": "_107_0_R_0_255",
+               "name": "Parameter Number"
+             },
+             {
+               "id": "VAL",
+               "editor": "ZY_CONFIG",
+               "name": "Parameter Value"
+             }
+           ]
+         },
+         {
+           "id": "WDU",
+           "name": "Write Changes"
+         }
+       ]
+     }
+   }
+ ]
+</example>
+</iox_nodedef>

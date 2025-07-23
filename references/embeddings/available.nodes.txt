@@ -1,0 +1,434 @@
+This file captures the @TYPE_NODE
+
+<available_nodes>
+<nodes>
+<root/>
+<folder flag="0">
+<address>29095</address>
+<name>~Unused</name>
+<family>13</family>
+<hint>0.0.0.0</hint>
+</folder>
+<node flag="128" nodeDefId="BltSvc">
+<address>n002_btsvcctrl</address>
+<name>Bluetooth Service</name>
+<family instance="2">10</family>
+<hint>0.0.0.0</hint>
+<type>0.0.0.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n002_btsvcctrl</pnode>
+</node>
+<node flag="128" nodeDefId="ZM00002_001_1">
+<address>ZM00002_001_1</address>
+<name>Matter Switch</name>
+<family>15</family>
+<hint>48.32.50.53</hint>
+<type>255.1.255.255</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>ZM00002_001_1</pnode>
+<rpnode>ZM00002_001_1</rpnode>
+<typeInfo>
+<t id="ioxType" val="103"/>
+<t id="mfgCode" val="0"/>
+<t id="model" val=""/>
+</typeInfo>
+<property id="ST" value="0" formatted="Off" uom="78" name=""/>
+</node>
+<node flag="128" nodeDefId="oadr3controlle">
+<address>n003_oadr3controlle</address>
+<name>Oadr3 Controller</name>
+<family instance="3">10</family>
+<hint>0.0.0.0</hint>
+<type>0.0.0.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n003_oadr3controlle</pnode>
+</node>
+<node flag="0" nodeDefId="oadr3ven">
+<address>n003_oadr3ven</address>
+<name>OpenADR 3.0 VEN</name>
+<family instance="3">10</family>
+<hint>0.0.0.0</hint>
+<parent type="1">n003_oadr3controlle</parent>
+<type>0.0.0.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n003_oadr3controlle</pnode>
+</node>
+<node flag="128" nodeDefId="ZB13046_001_1">
+<address>ZB13046_001_1</address>
+<name>ZB 13046.1 Main</name>
+<family>14</family>
+<hint>0.0.0.208</hint>
+<parent type="3">29095</parent>
+<type>255.1.255.255</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>ZB13046_001_1</pnode>
+<rpnode>ZB13046_001_1</rpnode>
+<typeInfo>
+<t id="ioxType" val="102"/>
+<t id="mfgCode" val="4107"/>
+<t id="model" val=""/>
+</typeInfo>
+</node>
+<node flag="128" nodeDefId="ZB13046_011_1">
+<address>ZB13046_011_1</address>
+<name>Living Room Hue</name>
+<family>14</family>
+<hint>0.0.0.0</hint>
+<type>255.1.255.255</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>ZB13046_011_1</pnode>
+<rpnode>ZB13046_001_1</rpnode>
+<typeInfo>
+<t id="ioxType" val="103"/>
+<t id="mfgCode" val="4107"/>
+<t id="model" val=""/>
+</typeInfo>
+<property id="ST" value="0" formatted="0%" uom="51" name=""/>
+</node>
+<node flag="0" nodeDefId="ZB13046_011_106">
+<address>ZB13046_011_106</address>
+<name>ZB 13046.11 Color Hue-Sat</name>
+<family>14</family>
+<hint>0.0.0.0</hint>
+<parent type="1">ZB13046_011_1</parent>
+<type>255.1.255.255</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>ZB13046_011_1</pnode>
+<rpnode>ZB13046_001_1</rpnode>
+<typeInfo>
+<t id="ioxType" val="106"/>
+<t id="mfgCode" val="4107"/>
+<t id="model" val=""/>
+</typeInfo>
+<property id="ST" value="312999" formatted="312.999°" uom="149" prec="3" name=""/>
+</node>
+<node flag="128" nodeDefId="ZB45186_001_1">
+<address>ZB45186_001_1</address>
+<name>ZB 45186.1 Main</name>
+<family>14</family>
+<hint>0.0.0.0</hint>
+<parent type="3">29095</parent>
+<type>255.1.255.255</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>ZB45186_001_1</pnode>
+<rpnode>ZB45186_001_1</rpnode>
+<typeInfo>
+<t id="ioxType" val="102"/>
+<t id="mfgCode" val="4107"/>
+<t id="model" val=""/>
+</typeInfo>
+</node>
+<node flag="128" nodeDefId="ZB45186_011_1">
+<address>ZB45186_011_1</address>
+<name>Family Room Hue</name>
+<family>14</family>
+<hint>0.0.0.0</hint>
+<type>255.1.255.255</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>ZB45186_011_1</pnode>
+<rpnode>ZB45186_001_1</rpnode>
+<typeInfo>
+<t id="ioxType" val="103"/>
+<t id="mfgCode" val="4107"/>
+<t id="model" val="LCA005"/>
+</typeInfo>
+<property id="ST" value="80" formatted="80%" uom="51" name=""/>
+</node>
+<node flag="0" nodeDefId="ZB45186_011_106">
+<address>ZB45186_011_106</address>
+<name>ZB 45186.11 Color Hue-Sat</name>
+<family>14</family>
+<hint>0.0.0.0</hint>
+<parent type="1">ZB45186_011_1</parent>
+<type>255.1.255.255</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>ZB45186_011_1</pnode>
+<rpnode>ZB45186_001_1</rpnode>
+<typeInfo>
+<t id="ioxType" val="106"/>
+<t id="mfgCode" val="4107"/>
+<t id="model" val="LCA005"/>
+</typeInfo>
+<property id="ST" value="221002" formatted="221.002°" uom="149" prec="3" name=""/>
+</node>
+<node flag="128" nodeDefId="ECO_CTR">
+<address>n001_controller</address>
+<name>Ecobee Controller</name>
+<family instance="1">10</family>
+<hint>0.0.0.0</hint>
+<parent type="3">29095</parent>
+<type>0.0.0.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n001_controller</pnode>
+</node>
+<node flag="128" nodeDefId="controller">
+<address>n004_controller</address>
+<name>Tesla EV Info</name>
+<family instance="4">10</family>
+<hint>0.0.0.0</hint>
+<parent type="3">29095</parent>
+<type>0.0.0.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n004_controller</pnode>
+</node>
+<node flag="128" nodeDefId="EcobeeF_412802015157">
+<address>n001_t412802015157</address>
+<name>Ecobee - Thermostat</name>
+<family instance="1">10</family>
+<hint>1.12.1.0</hint>
+<type>1.12.1.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n001_t412802015157</pnode>
+</node>
+<node flag="0" nodeDefId="EcobeeSensorHF">
+<address>n001_s412802015157</address>
+<name>Ecobee - Sensor</name>
+<family instance="1">10</family>
+<hint>1.3.2.0</hint>
+<parent type="1">n001_t412802015157</parent>
+<type>1.3.2.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n001_t412802015157</pnode>
+</node>
+<node flag="0" nodeDefId="EcobeeWeatherF">
+<address>n001_w412802015157</address>
+<name>Ecobee - Weather</name>
+<family instance="1">10</family>
+<hint>1.11.1.0</hint>
+<parent type="1">n001_t412802015157</parent>
+<type>1.11.1.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n001_t412802015157</pnode>
+</node>
+<node flag="0" nodeDefId="EcobeeWeatherF">
+<address>n001_f412802015157</address>
+<name>Ecobee - Forecast</name>
+<family instance="1">10</family>
+<hint>1.11.1.0</hint>
+<parent type="1">n001_t412802015157</parent>
+<type>1.11.1.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n001_t412802015157</pnode>
+</node>
+<node flag="0" nodeDefId="BltDev">
+<address>n002_f44efd324bdd</address>
+<name>Living Room Speaker</name>
+<family instance="2">10</family>
+<hint>0.0.0.0</hint>
+<parent type="1">n002_btsvcctrl</parent>
+<type>0.0.0.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n002_btsvcctrl</pnode>
+</node>
+<node flag="128" nodeDefId="evstatus">
+<address>n004_ev3e1ea5rf7219</address>
+<name>Batmobile</name>
+<family instance="4">10</family>
+<hint>0.0.0.0</hint>
+<type>0.0.0.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n004_ev3e1ea5rf7219</pnode>
+</node>
+<node flag="0" nodeDefId="evclimate">
+<address>n004_cl3e1ea5rf7219</address>
+<name>Climate Info</name>
+<family instance="4">10</family>
+<hint>0.0.0.0</hint>
+<parent type="1">n004_ev3e1ea5rf7219</parent>
+<type>0.0.0.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n004_ev3e1ea5rf7219</pnode>
+</node>
+<node flag="0" nodeDefId="evcharge">
+<address>n004_cg3e1ea5rf7219</address>
+<name>Charging Info</name>
+<family instance="4">10</family>
+<hint>0.0.0.0</hint>
+<parent type="1">n004_ev3e1ea5rf7219</parent>
+<type>0.0.0.0</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>n004_ev3e1ea5rf7219</pnode>
+</node>
+<node flag="0" nodeDefId="ZB13046_011_108">
+<address>ZB13046_011_108</address>
+<name>ZB 13046.11 Color XY</name>
+<family>14</family>
+<hint>105.102.105.48</hint>
+<parent type="1">ZB13046_011_1</parent>
+<type>255.1.255.255</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>ZB13046_011_1</pnode>
+<rpnode>ZB13046_001_1</rpnode>
+<typeInfo>
+<t id="ioxType" val="108"/>
+<t id="mfgCode" val="4107"/>
+<t id="model" val=""/>
+</typeInfo>
+</node>
+<node flag="0" nodeDefId="ZB45186_011_108">
+<address>ZB45186_011_108</address>
+<name>ZB 45186.11 Color XY</name>
+<family>14</family>
+<hint>0.0.0.80</hint>
+<parent type="1">ZB45186_011_1</parent>
+<type>255.1.255.255</type>
+<enabled>true</enabled>
+<deviceClass>0</deviceClass>
+<wattage>0</wattage>
+<dcPeriod>0</dcPeriod>
+<startDelay>0</startDelay>
+<endDelay>0</endDelay>
+<pnode>ZB45186_011_1</pnode>
+<rpnode>ZB45186_001_1</rpnode>
+<typeInfo>
+<t id="ioxType" val="108"/>
+<t id="mfgCode" val="4107"/>
+<t id="model" val="LCA005"/>
+</typeInfo>
+</node>
+<group flag="12" nodeDefId="InsteonDimmer">
+<address>00:21:b9:26:26:27</address>
+<name>Mom</name>
+<family>6</family>
+<hint>0.0.0.0</hint>
+<members>
+<link type="0">n002_btsvcctrl</link>
+<link type="0">ZM00002_001_1</link>
+<link type="0">n003_oadr3controlle</link>
+<link type="0">n003_oadr3ven</link>
+<link type="0">ZB13046_001_1</link>
+<link type="0">ZB13046_011_1</link>
+<link type="0">ZB13046_011_106</link>
+<link type="0">ZB45186_001_1</link>
+<link type="0">ZB45186_011_1</link>
+<link type="0">ZB45186_011_106</link>
+<link type="0">n001_controller</link>
+<link type="0">n004_controller</link>
+<link type="0">n001_t412802015157</link>
+<link type="0">n001_s412802015157</link>
+<link type="0">n001_w412802015157</link>
+<link type="0">n001_f412802015157</link>
+<link type="0">n002_f44efd324bdd</link>
+<link type="0">n004_ev3e1ea5rf7219</link>
+<link type="0">n004_cl3e1ea5rf7219</link>
+<link type="0">n004_cg3e1ea5rf7219</link>
+<link type="0">ZB13046_011_108</link>
+<link type="0">ZB45186_011_108</link>
+</members>
+</group>
+<group flag="132" nodeDefId="InsteonDimmer">
+<address>ADR0001</address>
+<name>Auto DR</name>
+<family>6</family>
+<hint>0.0.0.240</hint>
+<deviceGroup>16</deviceGroup>
+<pnode>ADR0001</pnode>
+<members/>
+</group>
+</nodes>
+</available_nodes>

@@ -1,0 +1,62 @@
+<iox_editor>
+@TYPE_EDITOR:
+- An editor is used to render a value or allow a selection of those values
+- An editor defines the set of allowed values and only the allowed values
+- An editor always has one or more ranges
+- A range must have the following attributes:
+ - UOM  : A Unit of measure of type @TYPE_UOM
+- All ranges within an editor must have a unique UOM
+- If a range has a precision of 0 then it may have have a list of names for some or all of the values
+ - names: The list of key/label pairs where the key is value and the label is the name of the value
+
+@TYPE_RANGE:
+- A range can be one of two types
+- Range @TYPE_MINMAX (min/max):
+ - min : The minimum value (not a Scaled Value)
+ - max : The maximum value (not a Scaled Value)
+ - prec : The precision to use for a Scaled value @TYPE_PREC
+ - step : The number to increment with each step for a spinner type widget (not a Scaled Value)
+
+- Range @TYPE_SUBSET (subset):
+ - The precision is always implied as 0
+ - subset : The subset of values supported is defined as a set of spans and individual values. They must be
+   in increasing value with no duplicates or overlap. Spans are separated by a '-', individual digits are
+   separated by a ','.
+    <example>e.g. subset="0-5,7,9,11-14" means these numbers: 0,1,2,3,4,5,7,9,11,12,13,14</example>
+
+--- An example of editors and ranges ---
+<example>
+ "editors": [
+   {
+     "id": "I3_LOAD_4",
+     "ranges": [
+       {
+         "uom": "25",
+         "min": 0,
+         "max": 4,
+         "names": {
+           "0": "Not Used",
+           "1": "Button 1",
+           "2": "Button 2",
+           "3": "Button 3",
+           "4": "Button 4"
+         }
+       }
+     ]
+   },
+   {
+     "id": "I3_ON_OFF",
+     "ranges": [
+       {
+         "uom": "2",
+         "subset": "0,1",
+         "names": {
+           "0": "Off",
+           "1": "On"
+         }
+       }
+     ]
+   },
+</example>
+
+</iox_editor>

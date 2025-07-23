@@ -1,0 +1,88 @@
+{
+  "description": "This schema defines the structure of a profile file. A profile file contains information about families and instances, including their IDs, names, and definitions.",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "iox_schema_profile.json",	
+  "title": "Profile Schema",
+  "type": "object",
+  "properties": {
+    "timestamp": { 
+      "description": "Timestamp of when the file was generated",
+      "type": "string" 
+    },
+    "families": {
+      "description": "Array of family objects. Each family contains instances and their node definitions.",
+      "type": "array",
+      "items": { 
+        "description": "Each item is a family object",
+        "$ref": "#/$defs/family"
+       }
+    }
+  },
+  "required": ["timestamp", "families"],
+  "additionalProperties": false,
+  "$defs": {
+    "family": {
+      "description": "A family object that contains instances and their node definitions.",
+      "type": "object",
+      "properties": {
+        "id": { 
+          "description": "Unique identifier for the family. Id must be unique within the whole system.",	
+          "type": "string" 
+        },
+        "name": { 
+          "description": "Human-readable name for the family in a natural language",
+          "type": "string" 
+        },
+        "instances": {
+          "type": "array",
+          "items": { 
+            "description": "Each item is an instance of a family.",
+            "$ref": "#/$defs/instance" 
+          }
+        }
+      },
+      "required": ["id", "name", "instances"],
+      "additionalProperties": false
+    },
+    "instance": {
+      "description": "An instance of a family",
+      "type": "object",
+      "properties": {
+        "id": { 
+          "description": "Unique identifier for the instance. Id must be unique within the family",
+          "type": "string" 
+        },
+        "name": { 
+          "description": "Human-readable name for the instance in a natural language",	
+          "type": "string" 
+        },
+        "editors": {
+          "description": "Array of editors that are used across the instancej.",
+          "type": "array",
+          "items": { 
+            "description": "Each item is an editor object",
+            "$ref": "iox_schema_editor.json#/definitions/editor" 
+          }
+        },
+        "linkdefs": {
+          "description": "Array of link definitions that are used across the instance.",
+          "type": "array",
+          "items": { 
+            "description": "Each item is a link definition object",	
+            "$ref": "iox_schema_linkdef.json" 
+          }
+        },
+        "nodedefs": {
+          "description": "Array of node definitions that are used across the instance.",
+          "type": "array",
+          "items": { 
+            "description": "Each item is a node definition object",	
+            "$ref": "iox_schema_nodedef.json" 
+          }
+        }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    }
+  }
+}

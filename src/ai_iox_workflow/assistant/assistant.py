@@ -11,10 +11,7 @@ from ai_iox_workflow.nucore import NuCore
 
 config = AIConfig()
 
-# Local llama.cpp server
-API_URL = "http://localhost:8000/v1/chat/completions"
-
-with open("src/ai_iox_workflow/assistant/system.prompt.qwen", "r") as f:
+with open(f"{config.__assistant_path__}/system.prompt.qwen", "r") as f:
     system_prompt = f.read().strip()
 
 with open(config.getToolsFile()) as f:
@@ -125,9 +122,9 @@ class NuCoreAssistant:
         if not query:
             print("No query provided, exiting ...")
         messages =[]
-        system_messages = []
+        system_prompt
         
-        system_messages.append({
+        system_message = ({
                 "role": "system",
                 "content": [
                     {
@@ -139,18 +136,13 @@ class NuCoreAssistant:
 
         #first use rag for relevant documents
         rag_results = self.nuCore.query(query, num_rag_results, rerank)
+        context = None
         if rag_results:
+            context = "***Relevant documents***\n"
             for document in rag_results['documents']:
-                system_messages.append({
-                    "role": "system",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": f"Relevant document: {document}"
-                        }
-                    ]
-                })
+                context += f"---\n{document}"
 
+        query = query.strip() if not context else f"{context.strip()}\n\n Customer Question: {query.strip()}"
         user_message = {
                 "role": "user",
                 "content": [
@@ -161,19 +153,21 @@ class NuCoreAssistant:
                 ]
         }
 
+        print (f"\n\n*********************Customer Query: {query}********************\n\n")
+
         if rag_results:
             print(f"\n\n*********************Top 5 Query Results:(Rerank = {rerank})********************\n\n")
             for i in range(len(rag_results['ids'])):
                 print(f"{i+1}. {rag_results['ids'][i]} - {rag_results['distances'][i]} - {rag_results['relevance_scores'][i]}")
             print("\n\n***************************************************************\n\n")
 
-    #    if not self.sent_system_prompt:
-    #        messages.append(system_messages)
-    #        self.sent_system_prompt = True
+        if not self.sent_system_prompt:
+            messages.append(system_message)
+            self.sent_system_prompt = True
 
         messages.append(user_message)
         # Step 1: Get tool call
-        response = requests.post(API_URL, json={
+        response = requests.post(config.getModelURL(), json={
             "messages": messages,
             "tools": tools, 
             "max_tokens": 128_000,
@@ -225,7 +219,7 @@ async def main(args):
                 print("Please enter a valid request")
                 continue
                 
-            await assistant.process_customer_input(user_input)
+            await assistant.process_customer_input(user_input, num_rag_results=3, rerank=False)
             
         except Exception as e:
             print(f"An error occurred: {e}")
