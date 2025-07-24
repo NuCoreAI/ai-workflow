@@ -55,6 +55,28 @@
             "justMyCode": false
         },
         {
+            "name": "combine samples", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "finetuning_data/combine_samples.py",
+            "console": "integratedTerminal",
+            "args": [
+               "--input_path=/home/michel/workspace/nucore/ai-workflow/finetuning_data/datasets/cpns",
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "parse cpn", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "finetuning_data/parse_cpn.py",
+            "console": "integratedTerminal",
+            "args": [
+               "input_file=/home/michel/workspace/nucore/ai-workflow/finetuning_data/datasets/cpns/nodes-0021b9262626_finetune_0.jsonl",
+            ],
+            "justMyCode": false
+        },
+        {
             "name": "start_servers", 
             "type": "debugpy",
             "request": "launch",

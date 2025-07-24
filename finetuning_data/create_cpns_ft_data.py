@@ -133,9 +133,6 @@ if __name__ == "__main__":
 
     output_path = Path(args.output_path) if args.output_path else OUTPUT_DIR
 
-    if not input_path.exists() or not input_path.is_dir():
-        raise ValueError(f"Input path {input_path} does not exist or is not a directory.")
-
     if not output_path.exists() or not output_path.is_dir():
         raise ValueError(f"Output path {output_path} does not exist or is not a directory.")
 
