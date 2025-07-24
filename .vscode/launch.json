@@ -47,6 +47,14 @@
             "justMyCode": false
         },
         {
+            "name": "create cpn (Colored Petri Nets) fine-tuning dataset", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "finetuning_data/create_cpns_ft_data.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "start_servers", 
             "type": "debugpy",
             "request": "launch",
