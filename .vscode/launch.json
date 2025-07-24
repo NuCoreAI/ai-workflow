@@ -55,6 +55,14 @@
             "justMyCode": false
         },
         {
+            "name": "tests a finetuned model directly on openpipe", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "finetuning_data/model_test.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "combine samples", 
             "type": "debugpy",
             "request": "launch",
