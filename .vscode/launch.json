@@ -85,7 +85,7 @@
             "program": "finetuning_data/combine_samples.py",
             "console": "integratedTerminal",
             "args": [
-               "--input_path=/home/michel/workspace/nucore/ai-workflow/finetuning_data/datasets/cpns",
+               "--input_path=/home/michel/workspace/nucore/ai-workflow/finetuning_data/datasets/dsls",
             ],
             "justMyCode": false
         },

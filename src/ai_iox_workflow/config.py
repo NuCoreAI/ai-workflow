@@ -7,6 +7,9 @@ DEFAULT_IOX_INSTALL_DIR_NAME = "src/ai_iox_workflow"
 DEFAULT_AI_INSTALL_DIR = os.path.join(DEFAULT_NUCORE_INSTALL_DIR, DEFAULT_AI_INSTALL_DIR_NAME)
 LLAMA_CPP_DIR = os.path.join(DEFAULT_NUCORE_INSTALL_DIR, "llama.cpp")
 LLAMA_CPP_EXECUTABLE = os.path.join(os.path.expanduser("~"), LLAMA_CPP_DIR, "build.blis/bin/llama-server")
+LLAMA_CPP_EXECUTABLE_WITH_GPU = os.path.join(os.path.expanduser("~"), LLAMA_CPP_DIR, "build.cuda/bin/llama-server")
+
+
 
 class AIConfig:
     def __init__(self, install_dir:str=None, data_path:str=None, models_path:str=None):
@@ -29,7 +32,7 @@ class AIConfig:
         self.__model_url__=f"http://{self.__model_host__}:{self.__model_port__}/v1/chat/completions"
         #self.__llm_model__ = "qwen2.5-coder-3b.gguf" 
         self.__llm_model__ = "llama3.1-8b-Q4_K_M.gguf"
-        self.__llm_model_params__ = "--jinja -c 0 --temp 0.0 --repeat-penalty 1.1"
+        self.__llm_model_params__ = "--jinja -c 32000 --temp 0.0 --repeat-penalty 1.1 --n-gpu-layers 100 --batch-size 512"
         self.__llm_model_server_args__ = f"-m {os.path.join(self.__models_path__,self.__llm_model__)} --host {self.__model_host__} --port {self.__model_port__} {self.__llm_model_params__}"
 
         self.__reranker_host__="localhost"

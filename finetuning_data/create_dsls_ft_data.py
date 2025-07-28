@@ -84,7 +84,6 @@ Action Format:
 ---
 
 Output Requirements:
-- Return only the **raw JSON object**, not a string. Do not wrap it in quotes. Do not escape it.
 - Use double quotes for all strings and object keys (valid JSON).
 - Device names and commands must come from the provided DEVICE STRUCTURE.
 - Use natural language in user queries (e.g. “make it cooler,” “turn off lights,” “optimize for low price”).
@@ -132,7 +131,6 @@ Guidelines:
 
     Use realistic device names, values, units, and patterns.
     
-    Return only the **raw JSON object**, not a string. Do not wrap it in quotes. Do not escape it.
 
 Reminder:
 
@@ -205,16 +203,16 @@ def generate_openpipe_entries(full_text, output_path, dump=True):
 
             except Exception as e:
                 print(f"Error processing JSON: {e}")
-                with open(output_path+".error", "w") as f:
+                with open(output_path.with_suffix(".error"), "w") as f:
                     f.write(str(e)+"\n*****\n")
-                    f.write(encoded)
+                    f.write(str(encoded))
                 return
 
         except Exception as e:
                 print(f"Error processing : {e}")
-                with open(output_path + ".error", "w") as f:
+                with open(output_path.with_suffix(".error"), "w") as f:
                     f.write(str(e)+"\n*****\n")
-                    f.write(encoded)
+                    f.write(str(encoded))
 
     with open(output_path, "w") as f:
         for item in jsonl_data:
