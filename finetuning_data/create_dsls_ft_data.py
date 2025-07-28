@@ -18,6 +18,7 @@ exec(open(SECRETS_DIR / "keys.py").read())  # This will set OPENAI_API_KEY
 
 
 #MODEL = "gpt-4o"  # Use the latest model available
+#MODEL = "gpt-4.1"
 MODEL = "gpt-4.1-mini"
 TEMPERATURE = 0.3
 MAX_TOKENS = 32_000 # Adjust based on your needs, but ensure it fits within the model's limits
@@ -31,11 +32,11 @@ You will receive a flattened structure description of smart devices, including
 - Parameters (with name, value, unit of measure, precision)
 The full structure is labled as `DEVICE STRUCTURE:` and a device is delineated by ***Device***.
 
-Your task is to generate OpenPipe fine-tuning samples that teach a model to construct automation and optimization routines using an extended, **flattened** version of JSONLogic.
+Your task is to generate OpenPipe fine-tuning samples that teach a model to construct automation and optimization routines using an extended version of JSONLogic.
 
 ---
 
-⚠️ **Important Distinction Between COS and COC:**
+**Important Distinction Between COS and COC:**
 
 1. **COS (Change of State)**:  
    A device property changes as a result of a command. This is recorded if and only if the value truly changes.  
@@ -47,9 +48,9 @@ Your task is to generate OpenPipe fine-tuning samples that teach a model to cons
 
 ---
 
-### ✅ Condition Examples:
+### Condition Examples:
 
-- **COS**: Check property state.
+**COS**: Check property state.
 {
   "==": {
     "device": "thermostat_1",
@@ -60,7 +61,7 @@ Your task is to generate OpenPipe fine-tuning samples that teach a model to cons
   }
 }
 
-- **COC**: Check command from **sends**:
+**COC**: Check command from **sends**:
 {
   "==": {
     "device": "switch",
@@ -71,7 +72,7 @@ Your task is to generate OpenPipe fine-tuning samples that teach a model to cons
   }
 }
 
-✅ Action Format:
+Action Format:
 {
   "device": "thermostat_1",
   "command": "SetCoolSetPoint",
@@ -80,17 +81,24 @@ Your task is to generate OpenPipe fine-tuning samples that teach a model to cons
   ]
 }
 
-✅ Output Requirements:
+---
 
-    Use flattened JSONLogic:
+Output Requirements:
+- Return only the **raw JSON object**, not a string. Do not wrap it in quotes. Do not escape it.
+- Use double quotes for all strings and object keys (valid JSON).
+- Device names and commands must come from the provided DEVICE STRUCTURE.
+- Use natural language in user queries (e.g. “make it cooler,” “turn off lights,” “optimize for low price”).
+- Conditions may include COS, COC, time, price, or status logic.
+- Actions must include full command syntax with parameters and metadata.
+- Use realistic device names, values, units, and patterns.
+- Use  JSONLogic:
+    - Give a meaningful name to each automation routine using the `name` key.
+    - No nested if blocks
+    - One top-level object: "automation" or "routine"
+    - Conditions and actions expressed as plain JSON key/values
+    - Return only the **raw JSON object**, not a string. Do not wrap it in quotes. Do not escape it.
 
-        No nested if blocks
-
-        One top-level object: "automation" or "routine"
-
-        Conditions and actions expressed as plain JSON key/values
-
-✅ Output must follow OpenPipe format::
+Output must follow OpenPipe format::
 {
   "messages": [
     {
@@ -103,12 +111,12 @@ Your task is to generate OpenPipe fine-tuning samples that teach a model to cons
     },
     {
       "role": "assistant",
-      "content": "<step-by-step reasoning>\n\n<flattened JSONLogic routine>"
+      "content": "<step-by-step reasoning>\n\n<JSONLogic routine as json object>"
     }
   ]
 }
 
-✅ Guidelines:
+Guidelines:
 
     Always start with detailed step-by-step reasoning, followed by JSON output.
 
@@ -123,19 +131,27 @@ Your task is to generate OpenPipe fine-tuning samples that teach a model to cons
     Actions must include full command syntax with parameters and metadata.
 
     Use realistic device names, values, units, and patterns.
+    
+    Return only the **raw JSON object**, not a string. Do not wrap it in quotes. Do not escape it.
 
-    Respond with valid JSON, not a JSON string. Do not escape any characters.
-
-🧠 Reminder:
+Reminder:
 
 COS = changes in property values.
 COC = commands sent by devices due to physical or external control.
 They are not interchangeable and must be evaluated separately.
-Respond with valid JSON, not a JSON string. Do not escape any characters.
+Return only the **raw JSON object**, not a string. Do not wrap it in quotes. Do not escape it.
 
-Now, generate **5 fine-tuning examples** in the OpenPipe JSONL format using the provided instructions.
+Finally:
+Output as many samples as possible. Each example must be in a single JSON object.
 
 """
+
+system_prompt_training = {
+    "role": "system",
+    "content": "You are a smart home assistant and NuCore expert in automation and optimization."
+}
+
+jsonl_data = []
 
 def generate_openpipe_entries(full_text, output_path, dump=True):
 
@@ -156,7 +172,7 @@ def generate_openpipe_entries(full_text, output_path, dump=True):
                 model=MODEL,
                 messages=messages,
                 temperature=TEMPERATURE,
-                max_tokens=MAX_TOKENS
+                max_tokens=MAX_TOKENS,
             )
 
             assistant_reply = response.choices[0].message.content.strip()
@@ -164,26 +180,47 @@ def generate_openpipe_entries(full_text, output_path, dump=True):
                 ("Assistant reply is empty. Please check the input text.")
                 if dump:
                     print(f"Assistant reply: {assistant_reply}")
-            assistant_reply
-            # Split the assistant reply into individual JSON objects
-            entries = assistant_reply.split("\r")
-            for entry in entries:
-                entry = entry.strip()
-                if entry:
-                    try:
-                        json_data = json.loads(entry)
-                        jsonl_data.append(json_data)
-                    except json.JSONDecodeError as e:
-                        print(f"Error decoding JSON: {e} | Entry: {entry}")
+            
+            encoded = assistant_reply.encode("utf-8")
+            try:
+                unescaped = json.loads(encoded)
+    
+                i = 0
+                for i in range(len(unescaped['messages'])-1):
+                    role = unescaped['messages'][i]['role']
+                    if role == "system":
+                        i+=1
+                        continue
+                    
+                    user=unescaped['messages'][i],
+                    assistant=unescaped['messages'][i+1],
+                    jsonl= {"messages": [
+                        system_prompt_training,
+                        user[0],
+                        assistant[0],
+                    ]}
+                    i+=2
+
+                    jsonl_data.append(jsonl)
+
+            except Exception as e:
+                print(f"Error processing JSON: {e}")
+                with open(output_path+".error", "w") as f:
+                    f.write(str(e)+"\n*****\n")
+                    f.write(encoded)
+                return
 
         except Exception as e:
-            print(f"Error: {e} | Input: {full_text[:60]}")
+                print(f"Error processing : {e}")
+                with open(output_path + ".error", "w") as f:
+                    f.write(str(e)+"\n*****\n")
+                    f.write(encoded)
 
     with open(output_path, "w") as f:
         for item in jsonl_data:
             f.write(json.dumps(item) + "\n")
+            print(f"✅ {len(jsonl_data)} entries saved to {output_path}")
 
-    print(f"✅ {len(jsonl_data)} entries saved to {output_path}")
 
 # Example usage
 if __name__ == "__main__":
@@ -258,7 +295,7 @@ if __name__ == "__main__":
                     content = content.strip()
                     full_text += content + "\n"
             if out_file:
-                print(f"Writing to {out_file}")
+                print(f"Processing  {out_file}")
                 generate_openpipe_entries(full_text, out_file, dump=True)
 
         except Exception as e:

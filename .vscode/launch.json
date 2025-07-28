@@ -63,6 +63,14 @@
             "justMyCode": false
         },
         {
+            "name": "test DSL (JSONLogic) fine-tuning dataset", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "finetuning_data/datasets/dsls/test_dsl_api.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "tests a finetuned model directly on openpipe", 
             "type": "debugpy",
             "request": "launch",

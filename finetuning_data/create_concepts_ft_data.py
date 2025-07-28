@@ -110,7 +110,7 @@ def generate_openpipe_entries(full_text, output_path, dump=True):
             if not assistant_reply:
                 ("Assistant reply is empty. Please check the input text.")
             # Split the assistant reply into individual JSON objects
-            entries = assistant_reply.split("\r")
+            entries = assistant_reply.split("\n")
             for entry in entries:
                 entry = entry.strip()
                 if entry:
