@@ -50,18 +50,25 @@ except Exception as e:
 
 system_prompt = f"""You are a smart home assistant and NuCore expert.
 
+NuCore is a revolutionary a smart home automation platform from NuCore.AI that allows you to control and automate various devices in a smart home environment.
+It provides a unified interface to manage devices, create automation rules, and optimize energy usage, comfort, security, health and safety, and convenience.
+
 You will receive a DEVICE STRUCTURE followed by a USER QUERY.
 
-Use the DEVICE STRUCTURE to understand the device’s properties, accepted and sent commands, and parameters (including range, unit, and type).
+Use the DEVICE STRUCTURE to understand the device’s properties, accept and send commands, and parameters (including range, unit, and type).
 
 Your task:
 - If the query is informational, respond clearly using context from the DEVICE STRUCTURE.
-- If the query requires automation or optimization, generate a Colored Petri Net (CPN) that models the goal.
-
-The CPN should:
-- Include **places**, **transitions**, and **tokens** with color (data).
-- Represent triggers, conditions, actions, and data flow accurately.
-- Be structured, readable, and useful for conversion to other automation formats.
+- If the query requires a command, provide the command name, parameters, their values and units of measure, and list the permissible ranges for each parameter.
+- If the query requires a property, provide the property name and its value and unit of measure.
+- If the query requires a parameter range, provide the parameter name and its minimum and maximum values, or a subset if applicable.
+- If the query requires status, look for the Status property and include its value and unit of measure and list the permissible ranges if applicable.
+- If the query asks for device name, use device structure's name.
+- If the query asks for device address, use device structure's ID.
+- If the query requires automation or optimization, generate a Colored Petri Net (CPN) that models the goal. The CPN should:
+    -- Include **places**, **transitions**, and **tokens** with color (data).
+    -- Represent triggers, conditions, actions, and data flow accurately.
+    -- Be structured, readable, and useful for conversion to other automation formats.
 
 DEVICE STRUCTURE:
 {device_docs}
@@ -76,8 +83,19 @@ while True:
         break
 
     completion = client.chat.completions.create(
-        model="openpipe:nucore-gemma", #<-- this is llama 3.1 8b
-        #model="openpipe:nucore-gemma-3-4b",
+        #Ranking models:
+        ## Good
+        ### Llama 3.1 8b
+        ## Mediocre
+        ### Llama 3.2 3b Instruct -- not bad 
+        ## Bad
+        ### Qwen 2.5 1.5b -- cannot use; max tokens is only 8192
+        ### Llama 3.2 1b
+        ### Gemma 3B
+
+
+        model="openpipe:blue-birds-send", #<-- this is llama 3.2 3b Instruct 
+        #model="openpipe:nucore-qwen25-1-5b", #<-- this is qwen 2.5 1.5b 
         messages=[
             {
                 "role": "system",
@@ -89,6 +107,7 @@ while True:
             }
         ],
         temperature=0,
+        max_tokens=8192,
         openpipe={
             "tags": {
                 "prompt_id": "counting",

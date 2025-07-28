@@ -55,6 +55,14 @@
             "justMyCode": false
         },
         {
+            "name": "create DSL (JSONLogic) fine-tuning dataset", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "finetuning_data/create_dsls_ft_data.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "tests a finetuned model directly on openpipe", 
             "type": "debugpy",
             "request": "launch",

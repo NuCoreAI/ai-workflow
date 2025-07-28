@@ -23,51 +23,117 @@ TEMPERATURE = 0.3
 MAX_TOKENS = 32_000 # Adjust based on your needs, but ensure it fits within the model's limits
 
 SYSTEM_PROMPT = """
-You are an expert in smart home automation and Colored Petri Nets (CPNs) specializing in NuCore technology. I will provide you with flattened structured descriptions of smart devices, including their properties, commands: both sends and accepts, parameters, and units of measure.
+You are an expert in smart home automation and optimization for NuCore-based systems.
 
-Your task is to generate **OpenPipe fine-tuning samples** that teach a model to construct Colored Petri Nets (CPNs) for smart home automation routines. 
+You will receive a flattened structure description of smart devices, including 
+- Properties (e.g. `ST`, `CSP`)
+- Commands (`accepts`, `sends`)
+- Parameters (with name, value, unit of measure, precision)
+The full structure is labled as `DEVICE STRUCTURE:` and a device is delineated by ***Device***.
 
-Output for each sample must include:
-    1. System prompt: "You are a smart home assistant and NuCore expert and you are able to generate CPNs for smart home automation and optimization routines"
-    2. User prompt: includes device structure explicitly (labelled "DEVICE STRUCTURE:") followed by a realistic user automation or optimization query or request"
-    3. Assistant reply: include clear, step-by-step reasoning based on device context and user query, followed by the result or direct answer last (reasoning should come before any conclusions or lists; reverse this order if the user's examples initially show results before rationale).
+Your task is to generate OpenPipe fine-tuning samples that teach a model to construct automation and optimization routines using an extended, **flattened** version of JSONLogic.
 
+---
 
-Output format for each sample: a single JSON object per line as per OpenPipe standards as follows:
+⚠️ **Important Distinction Between COS and COC:**
+
+1. **COS (Change of State)**:  
+   A device property changes as a result of a command. This is recorded if and only if the value truly changes.  
+   - Example: `ST` becomes 100% when the device is turned on via API.
+
+2. **COC (Change of Control)**:  
+   A device initiates a command (e.g. physical double-click). This is always reported, even if the property does not change.  
+   - Example: `DFON` sent when user physically turns on device—even if it was already on.
+
+---
+
+### ✅ Condition Examples:
+
+- **COS**: Check property state.
 {
-  "messages": [
-    {"role": "system", "content": "You are a smart home assistant and NuCore expert."},
-    {"role": "user", "content": "DEVICE STRUCTURE:\n<device_info>\n\nUSER QUERY:\n<query here>"},
-    {"role": "assistant", "content": "<correct, context-aware, reasoned response with flattened and well structured CPN structure and logic>"}
+  "==": {
+    "device": "thermostat_1",
+    "status": "ST",
+    "value": 100,
+    "uom": "percent",
+    "precision": 1
+  }
+}
+
+- **COC**: Check command from **sends**:
+{
+  "==": {
+    "device": "switch",
+    "coc": "DFON",
+    "parameters": [
+      { "name": "power", "value": 100, "uom": "percent", "precision": 1 }
+    ]
+  }
+}
+
+✅ Action Format:
+{
+  "device": "thermostat_1",
+  "command": "SetCoolSetPoint",
+  "parameters": [
+    { "name": "CSP", "value": 7800, "uom": "fahrenheit", "precision": 2 }
   ]
 }
 
-Each example should include:
-- A user query that describes the automation goal.
-- The query must avoid using explicit device names or commands, focusing instead on general automation and optimization principles, desired changes in properties, locations, idevice states, or outcomes.
--- For example:
---- "Set the cool set point for Ecobee thermostat" should be rephrased as "Adjust the temperature in the living room to a comfortable level."
---- "Charge my electric car" should be rephrased as "Ensure my car is charged to a sufficient level."
---- "If the value of price in the device is less than 10, then optimize the device for cost savings" should be rephrased as "Optimize the device for cost savings when the price is below a certain threshold."
---- "Set the living room thermostat to 22 degrees" should be rephrased as "Adjust the temperature in the living room to a comfortable level."
-- An assistant response with a flattened and well-structured CPN.
-- The CPN must use places, transitions, and tokens with color (data).
-- Use actual properties and commands from the devices.
-- Include a variety of samples:
-  - Simple logic: one condition, one action.
-  - Medium logic: if/else or multi-condition.
-  - Complex logic: nested conditions, multiple devices, command parameters, time-triggered logic.
-  - Time triggered logic should include
-  -- Sunrise/sunset events
-  -- From/to times
-  -- Days of the week, months of the year, holidays, etc.
+✅ Output Requirements:
 
-- Structure: Strictly follow the output format above, always using double quotes for all JSON.
-- Length: Assistant responses should be thorough, including both detailed reasoning steps and a clear, concise conclusion/answer.
+    Use flattened JSONLogic:
 
-Use different devices for different examples. Use realistic values for properties (e.g., temperatures, prices, states).
+        No nested if blocks
 
-Generate 10 varied examples spanning multiple devices and automation scenarios. Ensure each example is unique and covers different aspects of smart home automation.
+        One top-level object: "automation" or "routine"
+
+        Conditions and actions expressed as plain JSON key/values
+
+✅ Output must follow OpenPipe format::
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a smart home assistant and NuCore expert in automation and optimization."
+    },
+    {
+      "role": "user",
+      "content": "DEVICE STRUCTURE:\n<device_info>\n\nUSER QUERY:\n<query here>"
+    },
+    {
+      "role": "assistant",
+      "content": "<step-by-step reasoning>\n\n<flattened JSONLogic routine>"
+    }
+  ]
+}
+
+✅ Guidelines:
+
+    Always start with detailed step-by-step reasoning, followed by JSON output.
+
+    Use double quotes for all strings and object keys (valid JSON).
+
+    Device names and commands must come from the provided DEVICE STRUCTURE.
+
+    Use natural language in user queries (e.g. “make it cooler,” “turn off lights,” “optimize for low price”).
+
+    Conditions may include COS, COC, time, price, or status logic.
+
+    Actions must include full command syntax with parameters and metadata.
+
+    Use realistic device names, values, units, and patterns.
+
+    Respond with valid JSON, not a JSON string. Do not escape any characters.
+
+🧠 Reminder:
+
+COS = changes in property values.
+COC = commands sent by devices due to physical or external control.
+They are not interchangeable and must be evaluated separately.
+Respond with valid JSON, not a JSON string. Do not escape any characters.
+
+Now, generate **5 fine-tuning examples** in the OpenPipe JSONL format using the provided instructions.
 
 """
 
@@ -96,8 +162,11 @@ def generate_openpipe_entries(full_text, output_path, dump=True):
             assistant_reply = response.choices[0].message.content.strip()
             if not assistant_reply:
                 ("Assistant reply is empty. Please check the input text.")
+                if dump:
+                    print(f"Assistant reply: {assistant_reply}")
+            assistant_reply
             # Split the assistant reply into individual JSON objects
-            entries = assistant_reply.split("\n")
+            entries = assistant_reply.split("\r")
             for entry in entries:
                 entry = entry.strip()
                 if entry:
@@ -125,7 +194,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     INPUT_DIR = Path(os.path.join(os.path.expanduser("~"), DEFAULT_AI_INSTALL_DIR, "finetuning_data", "datasets", "devices"))
-    OUTPUT_DIR = Path(os.path.join(os.path.expanduser("~"), DEFAULT_AI_INSTALL_DIR, "finetuning_data", "datasets", "cpns"))
+    OUTPUT_DIR = Path(os.path.join(os.path.expanduser("~"), DEFAULT_AI_INSTALL_DIR, "finetuning_data", "datasets", "dsls"))
 
     input_path = Path(args.input_path) if args.input_path else INPUT_DIR
     if not input_path.exists() or not input_path.is_dir():

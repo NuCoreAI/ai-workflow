@@ -3,6 +3,8 @@ import re
 import requests
 import json
 import asyncio, argparse
+
+from sympy import true
 from ai_iox_workflow.iox.nucore_api import nucoreAPI
 from ai_iox_workflow.iox.nucore_programs import nucorePrograms
 from ai_iox_workflow.config import AIConfig
@@ -11,7 +13,7 @@ from ai_iox_workflow.nucore import NuCore
 
 config = AIConfig()
 
-with open(f"{config.__assistant_path__}/system.prompt.qwen", "r") as f:
+with open(f"{config.__assistant_path__}/system.prompt.qwen2.5", "r") as f:
     system_prompt = f.read().strip()
 
 with open(config.getToolsFile()) as f:
@@ -122,82 +124,132 @@ class NuCoreAssistant:
         if not query:
             print("No query provided, exiting ...")
         messages =[]
-        system_prompt
-        
-        system_message = ({
-                "role": "system",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": system_prompt 
-                    }
-                ]
-        })
 
-        #first use rag for relevant documents
-        rag_results = self.nuCore.query(query, num_rag_results, rerank)
-        context = None
-        if rag_results:
-            context = "***Relevant documents***\n"
-            for document in rag_results['documents']:
-                context += f"---\n{document}"
+        device_docs = ""
+        rag = self.nuCore.format_nodes()
+        if not rag:
+            raise ValueError(f"Warning: No RAG documents found for node {self.nuCore.url}. Skipping.")
 
-        query = query.strip() if not context else f"{context.strip()}\n\n Customer Question: {query.strip()}"
+        rag_docs = rag["documents"]
+        if not rag_docs:
+            raise ValueError(f"Warning: No documents found in RAG for node {self.nuCore.url}. Skipping.")
+
+        for rag_doc in rag_docs:
+            device_docs += "\n" + rag_doc
+
+        sprompt = system_prompt.replace("{device_docs}", device_docs)
+        sprompt.strip()
+        print(sprompt)
+
+        system_message = {
+            "role": "system",
+            "content": sprompt
+        }
         user_message = {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": query 
-                    }
-                ]
+            "role": "user",
+            "content": f"USER QUERY:\n{query.strip()}"
         }
 
-        print (f"\n\n*********************Customer Query: {query}********************\n\n")
+        #first use rag for relevant documents
+        #rag_results = self.nuCore.query(query, num_rag_results, rerank)
+        #context = None
+        #if rag_results:
+        #    context = "***Relevant documents***\n"
+        #    for document in rag_results['documents']:
+        #        context += f"---\n{document}"
+#
+#        query = query.strip() if not context else f"{context.strip()}\n\n Customer Question: {query.strip()}"
 
-        if rag_results:
-            print(f"\n\n*********************Top 5 Query Results:(Rerank = {rerank})********************\n\n")
-            for i in range(len(rag_results['ids'])):
-                print(f"{i+1}. {rag_results['ids'][i]} - {rag_results['distances'][i]} - {rag_results['relevance_scores'][i]}")
-            print("\n\n***************************************************************\n\n")
+#        print (f"\n\n*********************Customer Query: {query}********************\n\n")
 
-        if not self.sent_system_prompt:
-            messages.append(system_message)
-            self.sent_system_prompt = True
+#        if rag_results:
+#            print(f"\n\n*********************Top 5 Query Results:(Rerank = {rerank})********************\n\n")
+#            for i in range(len(rag_results['ids'])):
+#                print(f"{i+1}. {rag_results['ids'][i]} - {rag_results['distances'][i]} - {rag_results['relevance_scores'][i]}")
+#            print("\n\n***************************************************************\n\n")
+
+        #if not self.sent_system_prompt:
+        messages.append(system_message)
+        self.sent_system_prompt = True
 
         messages.append(user_message)
         # Step 1: Get tool call
-        response = requests.post(config.getModelURL(), json={
+        try:
+            with requests.post(config.getModelURL(), json={
             "messages": messages,
-            "tools": tools, 
-            "max_tokens": 128_000,
-            "temperature": 0.2,
-            "tool_choice": "auto"
-        })
+#            "tools": tools, 
+            "n_keep": -1,
+            "stream": True,
+            "cache_prompt": True,
+            "max_tokens": 131072,
+            "temperature": 0.0,
+#           "tool_choice": "auto"
+            }) as response:
+            
+                response.raise_for_status() # Raise an exception for bad status codes
 
-        response.raise_for_status()
-        if response.status_code != 200:
-            print(f"Error: {response.status_code} - {response.text}")
+                for line in response.iter_lines(): # Iterate over response lines
+                    if line:
+                        decoded_line = line.decode('utf-8')
+                        if decoded_line.startswith('data:'):
+                            json_data = decoded_line[len('data:'):].strip()
+                            if json_data == '[DONE]': # End of stream marker
+                                print("\n--- Stream completed ---")
+                                break
+                            try:
+                                chunk = json.loads(json_data)
+                                if 'choices' in chunk and chunk['choices']:
+                                    delta = chunk['choices'][0]['delta']
+                                    if 'content' in delta:
+                                        print(delta['content'], end='', flush=True) # Print content as it arrives
+
+                            except json.JSONDecodeError as e:
+                                print(f"Error decoding JSON chunk: {e}")
+        except requests.exceptions.RequestException as e:
+            print(f"Request failed: {e}")
             return None
 
-        data = response.json()
-        if "choices" not in data or len(data["choices"]) == 0:
-            print("No choices returned in the response.")
-            return None
+
+#        try:
+#            with requests.post(config.getModelURL(), json={
+#            "messages": messages,
+##            "tools": tools, 
+#            "n_keep": -1,
+#            "stream": True,
+#            "cache_prompt": True,
+#            "max_tokens": 128_000,
+#            "temperature": 0.0,
+##           "tool_choice": "auto"
+#            }) as r:
+#                for line in r.iter_lines():
+#                    if line:
+#                        print(json.loads(line.decode('utf-8')))
+#        except requests.exceptions.RequestException as e:
+##            print(f"Request failed: {e}")
+#            return None 
+#        response.raise_for_status()
+#        if response.status_code != 200:
+#            print(f"Error: {response.status_code} - {response.text}")
+#            return None
+
+#        data = response.json()
+#        if "choices" not in data or len(data["choices"]) == 0:
+#            print("No choices returned in the response.")
+#            return None
 
         # Extract tool call
-        tool_calls = data["choices"][0]["message"].get("tool_calls", [])
-        if not tool_calls:
-            print("No tool call returned.")
-            print(data["choices"][0]["message"])
-            return None
+#        tool_calls = data["choices"][0]["message"].get("tool_calls", [])
+#        if not tool_calls:
+#            print("No tool call returned.")
+#            print(data["choices"][0]["message"])
+#            return None
 
-        tool_call = tool_calls[0]
-        tool_name = tool_call["function"]["name"]
-        tool_args = None
-        if tool_call["function"]["arguments"]:
-            tool_args = json.loads(tool_call["function"]["arguments"])
-        await self.process_tool_call(tool_name, tool_args)
+#        tool_call = tool_calls[0]
+#        tool_name = tool_call["function"]["name"]
+#        tool_args = None
+#        if tool_call["function"]["arguments"]:
+#            tool_args = json.loads(tool_call["function"]["arguments"])
+#        await self.process_tool_call(tool_name, tool_args)
 
         return None 
     

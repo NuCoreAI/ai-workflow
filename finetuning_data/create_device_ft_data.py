@@ -44,7 +44,7 @@ Use this output format (each entry as a single line JSON object as shown below):
 ```json
 {
   "messages": [
-    {"role": "system", "content": "You are a smart home assistant."},
+    {"role":"system","content":"You are a smart home assistant and NuCore expert in automation and optimization."},
     {"role": "user", "content": "DEVICE STRUCTURE:\n<device_info>\n\nUSER QUERY:\n<query here>"},
     {"role": "assistant", "content": "<correct, context-aware, reasoned response>"}
   ]
@@ -79,7 +79,7 @@ def generate_openpipe_entries(full_text, output_path, dump=True):
             if not assistant_reply:
                 ("Assistant reply is empty. Please check the input text.")
             # Split the assistant reply into individual JSON objects
-            entries = assistant_reply.split("\n")
+            entries = assistant_reply.split("\r")
             for entry in entries:
                 entry = entry.strip()
                 if entry:

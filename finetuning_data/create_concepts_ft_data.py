@@ -57,7 +57,7 @@ Example samples:
 
 Example 1:
 {"messages":[
-  {"role":"system","content":"You are a smart home assistant and NuCore expert."},
+  {"role":"system","content":"You are a smart home assistant and NuCore expert in automation and optimization."},
   {"role":"user","content":"DEVICE STRUCTURE:\nDevice: Smart Thermostat\nProperties: Temperature (float, range: 10.0-30.0 °C), Humidity (int, range: 10-90 %), Mode (string, values: [off, heat, cool, auto])\nAccepted Commands: setTemperature(value: float, °C), setMode(mode: string), setHumidityTarget(value: int, %)\nSend Commands: reportTemperature(), reportHumidity()\n\nUSER QUERY:\nHow would I change the thermostat to heat mode?"},
   {"role":"assistant","content":"First, I check the available modes in the device structure: modes include off, heat, cool, and auto. The accepted command for changing modes is setMode, which requires a string parameter.\n\nTo change the thermostat to heat mode, use the setMode command with the parameter 'heat'.\n\nResult: Execute setMode with mode='heat' to switch to heat mode."}
 ]}
@@ -110,7 +110,7 @@ def generate_openpipe_entries(full_text, output_path, dump=True):
             if not assistant_reply:
                 ("Assistant reply is empty. Please check the input text.")
             # Split the assistant reply into individual JSON objects
-            entries = assistant_reply.split("\n")
+            entries = assistant_reply.split("\r")
             for entry in entries:
                 entry = entry.strip()
                 if entry:
