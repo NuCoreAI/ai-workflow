@@ -15,3 +15,76 @@ Examples:
 - "Can you guide me on plugin development for NuCore.AI?"
 - "What tools do I need to develop a plugin for NuCore.AI?"
 - "How can I create a custom plugin for NuCore.AI?"
+
+{
+  "type": "function",
+  "function": {
+  "name": "get_comfort_settings",
+  "category": "Get Comfort or Savings Settings",
+  "description": "If the user wants to retrieve their comfort or savings levels. If missing, default to Normal.",
+  "examples": [
+    "- What are my comfort settings?",
+    "- Can you tell me my savings mode?",
+    "- What is my current comfort level?",
+    "- How do I check my comfort settings?",
+    "- What is the current savings mode?",
+    "- What are my savings settings?",
+    "- What comfort levels do I have?",
+    "- What savings levels do I have?"
+  ],
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "mode": {
+        "type": "string",
+        "description": "either of savings, saving, or comfort. If not specified, defaults to comfort."
+      },
+      "customer_input": {
+        "type": "string",
+        "description": "original customer input"
+      }
+    },
+    "required": [
+      "mode", "customer_input"
+    ]
+  }
+  }
+},
+{
+  "type": "function",
+  "function": {
+  "name": "set_comfort_settings",
+  "category": "Set Comfort or Savings Settings",
+  "description": "If the user wants to set comfort or savings levels. If the level is not specified or unrecognized, default to Normal.", 
+  "examples": [
+    "- Set my comfort level to High",
+    "- Change my savings mode to Moderate",
+    "- I want to set my comfort settings to Normal",
+    "- Adjust my savings level to High",
+    "- Can you set my comfort mode to Moderate?",
+    "- Set my comfort settings to Low",
+    "- Set my comfort settings to Normal",
+    "- Set my comfort settings to Moderate",
+    "- Set my comfort settings to High",
+    "- Set my savings settings to Normal",
+    "- Set my savings settings to Moderate",
+    "- Set my savings settings to High"
+  ],
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "level": {
+        "type": "string",
+        "description": "Extracted comfort settings from the customer input: Normal, Moderate, or High. If not specified, defaults to Normal."
+      },
+      "customer_input": {
+        "type": "string",
+        "description": "original customer input"
+      }
+    },
+    "required": [
+      "level", "customer_input"
+    ]
+  }
+  }
+},

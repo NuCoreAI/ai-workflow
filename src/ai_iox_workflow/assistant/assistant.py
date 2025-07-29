@@ -2,6 +2,7 @@ import re
 
 import requests
 import json
+import httpx
 import asyncio, argparse
 
 from sympy import true
@@ -9,6 +10,11 @@ from ai_iox_workflow.iox.nucore_api import nucoreAPI
 from ai_iox_workflow.iox.nucore_programs import nucorePrograms
 from ai_iox_workflow.config import AIConfig
 from ai_iox_workflow.nucore import NuCore
+
+"""
+Best option
+build.cuda/bin/llama-server -m /home/michel/workspace/nucore/models/finetuned/qwen2.5-coder-dls-7b/qwen2.5-coder-dls-7b-Q4_K_M.gguf --jinja --host localhost -c 60000 --port 8013 -t 15  --n-gpu-layers 32 --batch-size 8192
+"""
 
 
 config = AIConfig()
@@ -18,9 +24,9 @@ with open(f"{config.__assistant_path__}/system.prompt.qwen2.5", "r") as f:
 
 with open(config.getToolsFile()) as f:
     tools = json.load(f)
-    for tool in tools:
-        if "function" in tool and "examples" in tool["function"]:
-            del tool["function"]["examples"]
+    #for tool in tools:
+    #    if "function" in tool and "examples" in tool["function"]:
+    #        del tool["function"]["examples"]
 
  
 comfort_settings="""
@@ -44,11 +50,6 @@ class NuCoreAssistant:
         )
         self.nuCore.load()
 
-    async def utility_price_available_routine(self, customer_input:str):
-        await self.send_response("Yes, you have an OpenADR 3.0 VEN service that offers both price and GHG signals!", True)
-  
-    async def which_device_automatable(self, customer_input:str):
-        await self.send_response("I can optimize and automate your Batmobile, your Ecobee - Thermostat, Family Room Hue, Living Room Hue, and Matter Switch. Unfortunately, I cannot do anything with your Bluetooth Service.", True)
 
     async def get_comfort_settings(self, customer_input:str):
         await self.send_response(f"Your comfort settings are: \r\n{comfort_settings}", True)
@@ -56,13 +57,26 @@ class NuCoreAssistant:
     async def set_comfort_settings(self, customer_input:str):
         await self.send_response(f"Ok, I set your comfort settings to: \r\n{customer_input['customer_input']}", True)
     
-    async def general_nucore_info(self, customer_input:str):
-        await self.send_response(f"Ok, I'll give you some high level information about NuCore.AI and how it works", True) 
-
-    async def pass_to_system(self, customer_input:str):
-        await self.send_response(f"I have no clue what you're talking about ... please rephrase your request", True) 
-
     async def create_automation_routine(self,customer_input:list):
+        if not customer_input or 'individual_prompts' not in customer_input :
+            return ("apologies, it seems that I may have lost your request. Please try again")
+        individual_prompts=customer_input['individual_prompts']
+        if len (individual_prompts) == 0:
+            return ("apologies, I couldn't understand your prompt.")
+
+        ep = nucoreAPI()
+        all_programs=nucorePrograms()
+        available_nodes=ep.get_nodes()
+        runtime_profile=ep.get_profiles()
+
+        for individual_prompt in individual_prompts:
+            await self.send_response(f"Ok, now: {individual_prompt}")
+            #user_prompt=self.get_auto_routine_prompt(individual_prompt, available_nodes, runtime_profile)
+            #system_prompt=self.get_system_prompt()
+
+        return ep.upload_programs(all_programs)
+    
+    async def command_device(self,customer_input:list):
         if not customer_input or 'individual_prompts' not in customer_input :
             return ("apologies, it seems that I may have lost your request. Please try again")
         individual_prompts=customer_input['individual_prompts']
@@ -82,6 +96,7 @@ class NuCoreAssistant:
         return ep.upload_programs(all_programs)
 
 
+
     async def process_tool_call(self,tool_name:str, tool_args):
         print (f"Tool call: {tool_name} with arguments: {tool_args if tool_args else 'None'}")
         if not tool_name:
@@ -89,18 +104,12 @@ class NuCoreAssistant:
         
         if tool_name == "create_automation_routine":
             return await self.create_automation_routine(tool_args)
-        elif tool_name == "utility_price_available_routine":
-            return await self.utility_price_available_routine(tool_args)
-        elif tool_name == "which_device_automatable":
-            return await self.which_device_automatable(tool_args)
-        elif tool_name == "general_nucore_info":
-            return await self.general_nucore_info(tool_args)
         elif tool_name == "get_comfort_settings":
             return await self.get_comfort_settings(tool_args)
         elif tool_name == "set_comfort_settings":
             return await self.set_comfort_settings(tool_args)
-        elif tool_name == "pass_to_system":
-            return await self.pass_to_system(tool_args)
+        elif tool_name == "command_device":
+            return await self.command_device(tool_args)
         return await self.send_response("Ooops, couldn't find the tool to process your request ... ")
 
     async def send_response(self, message, is_end=False):
@@ -175,6 +184,49 @@ class NuCoreAssistant:
         messages.append(user_message)
         # Step 1: Get tool call
         try:
+            with httpx.stream("POST", config.getModelURL(), timeout=100, json={
+            "messages": messages,
+#            "tools": tools,
+            "stream": True,
+            'cache_prompt':True,
+            "n_keep": -1,
+            "temperature": 0.0,
+            "max_tokens": 131072,
+            }) as response:
+                for line in response.iter_lines():
+                    if line.startswith("data: "):
+                        token_data = line[len(b"data: "):]
+                        try:
+                            finish_reason = json.loads(token_data.strip())['choices'][0]['finish_reason']
+                            if finish_reason == "stop":
+                                print("\n--- Stream completed ---")
+                                break
+                            elif finish_reason and (finish_reason == "tool_calls" or "<tools>" in finish_reason):
+                                print("\n--- Tool call detected ---")
+                                tool_calls = json.loads(token_data.strip())['choices'][0]['message'].get('tool_calls', [])
+                                if tool_calls:
+                                    tool_call = tool_calls[0]
+                                    tool_name = tool_call["function"]["name"]
+                                    tool_args = None
+                                    if tool_call["function"]["arguments"]:
+                                        tool_args = json.loads(tool_call["function"]["arguments"])
+                                    await self.process_tool_call(tool_name, tool_args)
+                                else:
+                                    print("No tool calls found in the response.")
+                                continue
+                            else:
+                                token_data = json.loads(token_data.strip())['choices'][0]['delta'].get('content', '')
+                        except json.JSONDecodeError:
+                            continue
+                        if token_data:
+                            # Print the token data as it arrives
+                            if isinstance(token_data, bytes):
+                                token_data = token_data.decode("utf-8")
+                            if token_data.strip():  # Only print non-empty tokens
+                                print(token_data, end="", flush=True)
+
+            return None
+
             with requests.post(config.getModelURL(), json={
             "messages": messages,
 #            "tools": tools, 
