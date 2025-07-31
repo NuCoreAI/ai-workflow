@@ -88,3 +88,41 @@ Examples:
   }
   }
 },
+
+{
+  "type": "function",
+  "function": {
+    "name": "create_automation_routine",
+    "category": "Automation and Optimization",
+    "description": "If the input asks to automate or optimize devices, the home, or specific locations based on price or comfort.  Assume utility prices are available",
+    "examples": [
+        "- Automate my Thermostat",
+        "- Optimize my lights and pool pump",
+        "- Can you automate my Batmobile based on utility prices?",
+        "- Can you optimize my Ecobee - Thermostat based on utility prices?",
+        "- Optimize my home (or house) based on utility prices",
+        "- Automate my house Room Hue based on energy prices"
+    ],
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "routines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "JSONLogic automation or optimization routine."
+        },
+        "original_input": {
+          "type": "string",
+          "description": "The full customer input, for reference and traceability"
+        },
+        "reasoning": {
+          "type": "string",
+          "description": "The LLM reasoning for the automation or optimization routine, if applicable"
+        }
+      },
+      "required": ["routines"]
+    }
+  }
+},

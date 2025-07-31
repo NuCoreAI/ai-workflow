@@ -15,18 +15,19 @@ from ai_iox_workflow.nucore import NuCore
 Best option
 build.cuda/bin/llama-server -m /home/michel/workspace/nucore/models/finetuned/qwen2.5-coder-dls-7b/qwen2.5-coder-dls-7b-Q4_K_M.gguf --jinja --host localhost -c 60000 --port 8013 -t 15  --n-gpu-layers 32 --batch-size 8192
 """
-
+tools = False
 
 config = AIConfig()
-
-with open(f"{config.__assistant_path__}/system.prompt.qwen2.5", "r") as f:
+# if tools else "/system.prompt.qwen2.5"}", "r") as f:
+with open(f"{config.__assistant_path__}/system.prompt.qwen2.5-tools", "r") as f:
     system_prompt = f.read().strip()
 
-with open(config.getToolsFile()) as f:
-    tools = json.load(f)
-    #for tool in tools:
-    #    if "function" in tool and "examples" in tool["function"]:
-    #        del tool["function"]["examples"]
+if tools:
+    with open(config.getToolsFile()) as f:
+        tools = json.load(f)
+        #for tool in tools:
+        #    if "function" in tool and "examples" in tool["function"]:
+        #        del tool["function"]["examples"]
 
  
 comfort_settings="""
@@ -183,16 +184,21 @@ class NuCoreAssistant:
 
         messages.append(user_message)
         # Step 1: Get tool call
-        try:
-            with httpx.stream("POST", config.getModelURL(), timeout=100, json={
+        payload={
             "messages": messages,
-#            "tools": tools,
             "stream": True,
             'cache_prompt':True,
             "n_keep": -1,
             "temperature": 0.0,
-            "max_tokens": 131072,
-            }) as response:
+            "max_tokens": 60_000,
+        }
+        if tools:
+            payload["tools"] = tools
+            payload["tool_choice"] = "auto" 
+        full_response = ""
+        try:
+            with httpx.stream("POST", config.getModelURL(), timeout=100, json=payload
+            ) as response:
                 for line in response.iter_lines():
                     if line.startswith("data: "):
                         token_data = line[len(b"data: "):]
@@ -201,108 +207,43 @@ class NuCoreAssistant:
                             if finish_reason == "stop":
                                 print("\n--- Stream completed ---")
                                 break
-                            elif finish_reason and (finish_reason == "tool_calls" or "<tools>" in finish_reason):
-                                print("\n--- Tool call detected ---")
-                                tool_calls = json.loads(token_data.strip())['choices'][0]['message'].get('tool_calls', [])
-                                if tool_calls:
-                                    tool_call = tool_calls[0]
-                                    tool_name = tool_call["function"]["name"]
-                                    tool_args = None
-                                    if tool_call["function"]["arguments"]:
-                                        tool_args = json.loads(tool_call["function"]["arguments"])
-                                    await self.process_tool_call(tool_name, tool_args)
-                                else:
-                                    print("No tool calls found in the response.")
-                                continue
-                            else:
-                                token_data = json.loads(token_data.strip())['choices'][0]['delta'].get('content', '')
+                            token_data = json.loads(token_data.strip())['choices'][0]['delta'].get('content', '')
                         except json.JSONDecodeError:
                             continue
                         if token_data:
                             # Print the token data as it arrives
                             if isinstance(token_data, bytes):
                                 token_data = token_data.decode("utf-8")
-                            if token_data.strip():  # Only print non-empty tokens
-                                print(token_data, end="", flush=True)
+                            #if token_data.strip():  # Only print non-empty tokens
+                            print(token_data, end="", flush=True)
+                            full_response += token_data
 
-            return None
+            # now parse the full response and look for blocks between __NUCORE_COMMAND_BEGIN__ and __NUCORE_COMMAND_END__. 
+            # convert the blocks to json and add to list
+            commands = []
+            command_pattern = re.compile(r'__BEGIN_NUCORE_COMMAND__(.*?)__END_NUCORE_COMMAND__', re.DOTALL)
+            matches = command_pattern.findall(full_response)
 
-            with requests.post(config.getModelURL(), json={
-            "messages": messages,
-#            "tools": tools, 
-            "n_keep": -1,
-            "stream": True,
-            "cache_prompt": True,
-            "max_tokens": 131072,
-            "temperature": 0.0,
-#           "tool_choice": "auto"
-            }) as response:
-            
-                response.raise_for_status() # Raise an exception for bad status codes
+            for match in matches:
+                try:
+                    # Remove any comments that start with //, # or /* and end with */
+                    match = re.sub(r'//.*?$|#.*?$|/\*.*?\*/', '', match, flags=re.MULTILINE)
+                    # Remove any leading or trailing whitespace
+                    match = match.strip()
+                    if not match:
+                        continue
+                    # Parse the JSON block
+                    command_json = json.loads(match.strip())
+                    commands.append(command_json)
+                except json.JSONDecodeError as e:
+                    print(f"Error decoding JSON from command block: {e}")
 
-                for line in response.iter_lines(): # Iterate over response lines
-                    if line:
-                        decoded_line = line.decode('utf-8')
-                        if decoded_line.startswith('data:'):
-                            json_data = decoded_line[len('data:'):].strip()
-                            if json_data == '[DONE]': # End of stream marker
-                                print("\n--- Stream completed ---")
-                                break
-                            try:
-                                chunk = json.loads(json_data)
-                                if 'choices' in chunk and chunk['choices']:
-                                    delta = chunk['choices'][0]['delta']
-                                    if 'content' in delta:
-                                        print(delta['content'], end='', flush=True) # Print content as it arrives
+            if commands:
+                print("****Time to run some commands!")
+                print (commands)
 
-                            except json.JSONDecodeError as e:
-                                print(f"Error decoding JSON chunk: {e}")
-        except requests.exceptions.RequestException as e:
-            print(f"Request failed: {e}")
-            return None
-
-
-#        try:
-#            with requests.post(config.getModelURL(), json={
-#            "messages": messages,
-##            "tools": tools, 
-#            "n_keep": -1,
-#            "stream": True,
-#            "cache_prompt": True,
-#            "max_tokens": 128_000,
-#            "temperature": 0.0,
-##           "tool_choice": "auto"
-#            }) as r:
-#                for line in r.iter_lines():
-#                    if line:
-#                        print(json.loads(line.decode('utf-8')))
-#        except requests.exceptions.RequestException as e:
-##            print(f"Request failed: {e}")
-#            return None 
-#        response.raise_for_status()
-#        if response.status_code != 200:
-#            print(f"Error: {response.status_code} - {response.text}")
-#            return None
-
-#        data = response.json()
-#        if "choices" not in data or len(data["choices"]) == 0:
-#            print("No choices returned in the response.")
-#            return None
-
-        # Extract tool call
-#        tool_calls = data["choices"][0]["message"].get("tool_calls", [])
-#        if not tool_calls:
-#            print("No tool call returned.")
-#            print(data["choices"][0]["message"])
-#            return None
-
-#        tool_call = tool_calls[0]
-#        tool_name = tool_call["function"]["name"]
-#        tool_args = None
-#        if tool_call["function"]["arguments"]:
-#            tool_args = json.loads(tool_call["function"]["arguments"])
-#        await self.process_tool_call(tool_name, tool_args)
-
+        except Exception as e:
+            print(f"An error occurred while processing the customer input: {e}")
         return None 
     
 
