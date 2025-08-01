@@ -214,9 +214,17 @@ class NuCoreAssistant:
             "role": "system",
             "content": sprompt
         }
+        query= query.strip()
+        if not query:
+            await self.send_response("No query provided, exiting ...", True)
+            return None
+        if query.startswith("!!"):
+            # This is a code-only query, so we don't need to send the system prompt
+            query = "[no-code][no-explanation] " + query 
+
         user_message = {
             "role": "user",
-            "content": f"USER QUERY:\n{query.strip()}"
+            "content": f"USER QUERY:\n{query}"
         }
 
         #first use rag for relevant documents

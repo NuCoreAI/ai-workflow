@@ -147,7 +147,7 @@ class EditorMinMaxRange:
         """
         Returns a description of the range.
         """
-        desc = f"Range {self.min} to {self.max} Unit {self.uom.label}"
+        desc = f"Range {self.min} to {self.max} Unit {self.uom.label} [uom id={self.uom.id}]"
         if self.step:
             desc += f" (step of {self.step} and precision of {self.prec if self.prec else 1})."
 

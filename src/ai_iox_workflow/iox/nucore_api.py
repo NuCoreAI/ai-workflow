@@ -150,13 +150,57 @@ class nucoreAPI:
         # Construct the url: /rest/nodes/<device_id>/cmd/<command_id>/<params[value] 
 
         url = f"/rest/nodes/{device_id}/cmd/{command_id}"
-        for param in command_params:
-            value= param.get("value")
+        if len(command_params) == 1:
+            param = command_params[0]
+            id = param.get("id", None)
+            uom = param.get("uom", None)
+            value = param.get("value", None)
             if value:
-                url+=f"/{value}"
-#            uom = param.get("uom")
-#            if uom:
-#                url+=f"/.uom{uom}"
+                if not id:
+                    url += f"/{value}"
+                    if uom:
+                        url += f"/{uom}"
+                else:
+                    url += f"?{id}"
+                    if uom:
+                        url += f".{uom}"
+                    url += f"={value}"
+        elif len(command_params) > 1:
+            unamed_params = [p for p in command_params if not p.get("id")]
+            named_params = [p for p in command_params if p.get("id")]
+
+            # Add all parameters to the url
+            for param in unamed_params:
+                value = param.get("value")
+                if not value:
+                    print(f"No value found for unnamed parameter in command {command_id}")
+                    continue
+                url += f"/{value}"
+                uom = param.get("uom")
+                if uom:
+                    url += f"/{uom}"
+
+            if len(named_params) > 0:
+                i = 0
+                # Add named parameters to the url
+                for param in named_params:
+                    the_rest_of_the_url = ""
+                    id = param.get("id")
+                    value = param.get("value")
+                    if not id: 
+                        print(f"No id found for named parameter in command {command_id}")
+                        continue
+                    if not value:
+                        print(f"No value found for named parameter {id} in command {command_id}")
+                        continue
+
+                    the_rest_of_the_url = f"?{id}" if i == 0 else f"&{id}"
+                    uom = param.get("uom")
+                    if uom:
+                        the_rest_of_the_url += f".{uom}"
+                    the_rest_of_the_url += f"={value}"
+                    url += the_rest_of_the_url
+                    i += 1
 
         response = self.__get(url)
         if response == None:
