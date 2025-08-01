@@ -92,10 +92,13 @@ class NuCoreAssistant:
                 continue
             prop_id = property.get('property_id')
             prop_name = property.get('property_name')
+            device_name = self.nuCore.get_device_name(device_id)
+            if not device_name:
+                device_name = device_id
             if prop_id:
                 prop = properties.get(prop_id)
                 if prop:
-                    text = f"\nNuCore: {prop_name if prop_name else prop_id} value for device {property['device_id']} is: {prop.formatted if prop.formatted else prop.value}"
+                    text = f"\nNuCore: {prop_name if prop_name else prop_id} for {device_name} is: {prop.formatted if prop.formatted else prop.value}"
                     #await self.send_user_content_to_llm(text)
                     await self.send_response(text, True)
                 else:

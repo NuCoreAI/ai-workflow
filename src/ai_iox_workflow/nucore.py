@@ -380,7 +380,7 @@ class NuCore:
 
         self.__build_nodedef_lookup__()
 
-        self.nodes = []
+        self.nodes = {} 
         for node_elem in root.findall(".//node"):
             typeinfo_elems = node_elem.findall("./typeInfo/t")
             typeinfo = [
@@ -440,7 +440,7 @@ class NuCore:
                 if not node.node_def:
                     debug(f"[WARN] No NodeDef found for: {node_def_id}")
 
-            self.nodes.append(node)
+            self.nodes[node.address] = node
 
         return self.nodes
         
@@ -459,7 +459,7 @@ class NuCore:
         
         return self.rag_processor.query(query_text, num_results, rerank=rerank)
 
-    def send_commands(self, commands:list):
+    async def send_commands(self, commands:list):
         nucore_api = nucoreAPI(base_url=self.url, username=self.username, password=self.password)
         response = nucore_api.send_commands(commands)
         if response is None:
@@ -484,7 +484,22 @@ class NuCore:
         if properties is None:
             raise NuCoreError(f"Failed to get properties for device {device_id}.")
         return properties
+    
+    def get_device_name(self, device_id:str)-> str:
+        """
+        Get the name of a device by its ID.
+        
+        Args:
+            device_id (str): The ID of the device to get the name for.
+        
+        Returns:
+            str: The name of the device, or None if not found.
+        """
+        if not self.nodes:
+            raise NuCoreError("No nodes loaded.")
 
+        node = self.nodes.get(device_id, None)  # Return None if device_id not found
+        return node.name if node.name else device_id
 
     def __str__(self):
         if not self.profile:

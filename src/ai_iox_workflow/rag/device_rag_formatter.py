@@ -164,10 +164,10 @@ class DeviceRagFormatter(RAGFormatter):
         """
         if not "nodes" in kwargs:
             raise ValueError("No nodes provided to format")
-        if not isinstance(kwargs["nodes"], list):
-            raise ValueError("Nodes must be a list")
+        if not isinstance(kwargs["nodes"], dict):
+            raise ValueError("Nodes must be a dictionary")
         nodes = kwargs["nodes"]
-        for node in nodes:
+        for node in nodes.values():
             self.format_node(node)
         rag_docs:RAGData = RAGData()
         i = 0
