@@ -57,7 +57,7 @@ class DeviceRagFormatter(RAGFormatter):
 
     def add_property(self, prop: NodeProperty):
         with self.block(level_increase=4):
-            self.write(f"{prop.name}")
+            self.write(f"{prop.name} [id={prop.id}]")
             if prop.editor and prop.editor.ranges:
                 for range in prop.editor.ranges:
                     with self.block():

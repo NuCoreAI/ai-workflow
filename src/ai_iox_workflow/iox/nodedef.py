@@ -4,6 +4,16 @@ from .editor import Editor
 from .cmd import Command
 from .linkdef import LinkDef
 
+#the actual node property that maps to 
+@dataclass
+class Property:
+    id: str
+    value: str
+    formatted: str
+    uom: str
+    prec: int = field(default=None)
+    name: str = field(default=None)
+
 
 @dataclass
 class NodeProperty:
@@ -54,7 +64,7 @@ class NodeDef:
     """
 
     id: str
-    properties: list[NodeProperty]
+    properties: dict[str, NodeProperty]
     cmds: NodeCommands
     nls: str = None
     icon: str = None

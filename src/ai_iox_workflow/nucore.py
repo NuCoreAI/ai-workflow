@@ -71,7 +71,9 @@ class NuCore:
         response = nucore_api.get_profiles()
         if response is None:
             raise NuCoreError("Failed to fetch profile from URL.")
-        return self.__parse_profile__(response) 
+        return self.__parse_profile__(response)
+
+
 
     def __parse_profile__(self, raw):
         """Build Profile from dict, with type/checking and lookups"""
@@ -317,30 +319,60 @@ class NuCore:
         return static_info_rag_formatter.format(static_info_path=config.getStaticInfoPath())
 
     def load_rag_docs(self, **kwargs):
+        """
+        Load RAG documents from the specified nodes and profile.
+        :param kwargs: Optional parameters for formatting.
+        - embed: If True, embed the RAG documents.
+        - include_rag_docs: If True, include RAG documents in the output.
+        - tools: If True, include tools in the RAG documents.
+        - static_info: If True, include static information in the RAG documents.
+        - dump: If True, dump the processed RAG documents to a file.
+        :raises NuCoreError: If no nodes or profile are loaded.
+        :return: Processed RAG documents.
+        """
         device_rag_docs = self.format_nodes()
-        tools_rag_docs = self.format_tools()
-        static_info_rag_docs = self.format_static_info()
+        embed = kwargs.get("embed", False) 
+        all_docs = device_rag_docs
+        tools = kwargs.get("tools", False)
+        static_info = kwargs.get("static_info", False)
+        dump = kwargs.get("dump", False)
+        if tools: 
+            tools_rag_docs = self.format_tools()
+            if tools_rag_docs:
+                all_docs += tools_rag_docs
+        
+        if static_info: 
+            static_info_rag_docs = self.format_static_info()
+            if static_info_rag_docs:
+                all_docs += static_info_rag_docs
 
-        all_docs = device_rag_docs + tools_rag_docs + static_info_rag_docs
-
-        processed_docs = self.rag_processor.process(all_docs)
-        if "dump" in kwargs and kwargs["dump"] is True:
+        processed_docs = all_docs
+        if embed:
+            processed_docs = self.rag_processor.process(all_docs)
+        if dump:
             self.rag_processor.dump()
         return processed_docs
 
-    def load(self, include_rag_docs=True):
+
+    def load(self, **kwargs):
+        
         """
         Load devices and profiles from the specified paths or URL.
         """
-
+        
+        include_rag_docs = kwargs.get("include_rag_docs", False)
+        dump = kwargs.get("dump", False)
+        
         rc = self.load_devices()
         if include_rag_docs:
-            rc = self.load_rag_docs(dump=True)
+            rc = self.load_rag_docs(dump=dump)
         return rc
 
-    def load_devices(self):
-        if not self.load_profile():
-            return None
+    # To have the latest state, we need to load devices only
+    def load_devices(self, include_profiles=True):
+        if include_profiles:
+            if not self.load_profile():
+                return None
         
         root = self.__load_nodes__()
         if root == None:
@@ -356,17 +388,18 @@ class NuCore:
             ]
 
             property_elems = node_elem.findall("./property")
-            properties = [
-                Property(
-                    p.get("id"),
-                    p.get("value"),
-                    p.get("formatted"),
-                    p.get("uom"),
-                    p.get("prec"),
-                    p.get("name"),
+            properties = {}
+            for p_elem in property_elems:
+                prop = Property(
+                    id=p_elem.get("id"),
+                    value=p_elem.get("value"),
+                    formatted=p_elem.get("formatted"),
+                    uom=p_elem.get("uom"),
+                    prec=int(p_elem.get("prec")) if p_elem.get("prec") else None,
+                    name=p_elem.get("name"),
                 )
-                for p in property_elems
-            ]
+                properties[prop.id] = prop 
+
             node_def_id = node_elem.get("nodeDefId")
 
             node = Node(
@@ -391,7 +424,7 @@ class NuCore:
                 if node_elem.find("./sgid") is not None
                 else None,
                 typeInfo=typeinfo,
-                property=properties,
+                properties=properties,
                 parent=node_elem.find("./parent").text
                 if node_elem.find("./parent") is not None
                 else None,
@@ -425,6 +458,32 @@ class NuCore:
             raise NuCoreError("RAG processor is not initialized.")
         
         return self.rag_processor.query(query_text, num_results, rerank=rerank)
+
+    def send_commands(self, commands:list):
+        nucore_api = nucoreAPI(base_url=self.url, username=self.username, password=self.password)
+        response = nucore_api.send_commands(commands)
+        if response is None:
+            raise NuCoreError("Failed to send commands.")
+        return response
+    
+    async def get_properties(self, device_id:str)-> dict[str, Property]:
+        """
+        Get properties of a device by its ID.
+        
+        Args:
+            device_id (str): The ID of the device to get properties for.
+        
+        Returns:
+            dict[str, Property]: A dictionary of properties for the device.
+        Raises:
+            NuCoreError: If the device_id is empty or if the response cannot be parsed.
+        """
+        # Use nucoreAPI to fetch properties
+        nucore_api = nucoreAPI(base_url=self.url, username=self.username, password=self.password)
+        properties = nucore_api.get_properties(device_id)
+        if properties is None:
+            raise NuCoreError(f"Failed to get properties for device {device_id}.")
+        return properties
 
 
     def __str__(self):

@@ -77,43 +77,68 @@ class NuCoreAssistant:
 
         return ep.upload_programs(all_programs)
     
-    async def command_device(self,customer_input:list):
-        if not customer_input or 'individual_prompts' not in customer_input :
-            return ("apologies, it seems that I may have lost your request. Please try again")
-        individual_prompts=customer_input['individual_prompts']
-        if len (individual_prompts) == 0:
-            return ("apologies, I couldn't understand your prompt.")
+    async def process_property_query(self, prop_query:list):
+        if not prop_query or len(prop_query) == 0:
+            return "No property query provided"
+        for property in prop_query:
+            # Process the property query
+            device_id = property.get('device_id')
+            if not device_id:
+                print(f"No device ID provided for property query: {property}")
+                continue
+            properties = await self.nuCore.get_properties(device_id)
+            if not properties:
+                print(f"No properties found for device {property['device_id']}")
+                continue
+            prop_id = property.get('property_id')
+            prop_name = property.get('property_name')
+            if prop_id:
+                prop = properties.get(prop_id)
+                if prop:
+                    text = f"\nNuCore: {prop_name if prop_name else prop_id} value for device {property['device_id']} is: {prop.formatted if prop.formatted else prop.value}"
+                    #await self.send_user_content_to_llm(text)
+                    await self.send_response(text, True)
+                else:
+                    print( f"Property {prop_id} not found for device {property['device_id']}")
+            else:
+                print(f"No property ID provided for device {property['device_id']}")
 
-        ep = nucoreAPI()
-        all_programs=nucorePrograms()
-        available_nodes=ep.get_nodes()
-        runtime_profile=ep.get_profiles()
 
-        for individual_prompt in individual_prompts:
-            await self.send_response(f"Ok, now: {individual_prompt}")
-            #user_prompt=self.get_auto_routine_prompt(individual_prompt, available_nodes, runtime_profile)
-            #system_prompt=self.get_system_prompt()
-
-        return ep.upload_programs(all_programs)
-
-
-
-    async def process_tool_call(self,tool_name:str, tool_args):
-        print (f"Tool call: {tool_name} with arguments: {tool_args if tool_args else 'None'}")
-        if not tool_name:
+    async def process_tool_call(self,full_response:str, begin_marker, end_marker):
+        if not full_response or not begin_marker or not end_marker:
             return None
         
-        if tool_name == "create_automation_routine":
-            return await self.create_automation_routine(tool_args)
-        elif tool_name == "get_comfort_settings":
-            return await self.get_comfort_settings(tool_args)
-        elif tool_name == "set_comfort_settings":
-            return await self.set_comfort_settings(tool_args)
-        elif tool_name == "command_device":
-            return await self.command_device(tool_args)
-        return await self.send_response("Ooops, couldn't find the tool to process your request ... ")
+        parameters = []
+        command_pattern = re.compile(rf'{begin_marker}(.*?){end_marker}', re.DOTALL)
+        matches = command_pattern.findall(full_response)
+
+        for match in matches:
+            try:
+                # Remove any comments that start with //, # or /* and end with */
+                match = re.sub(r'//.*?$|#.*?$|/\*.*?\*/', '', match, flags=re.MULTILINE)
+                # Remove any leading or trailing whitespace
+                match = match.strip()
+                if not match:
+                    continue
+                # Parse the JSON block
+                parameter_json = json.loads(match.strip())
+                parameters.append(parameter_json)
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON from nucore block: {e}")
+                return None
+            
+        if len(parameters) > 0:
+            if begin_marker == "__BEGIN_NUCORE_COMMAND__":
+                return await self.nuCore.send_commands(parameters)
+        
+            elif begin_marker == "__BEGIN_NUCORE_PROPERTY_QUERY__":
+                return await self.process_property_query(parameters) 
+        
+        return None
 
     async def send_response(self, message, is_end=False):
+        if not message:
+            return
         if self.websocket:
             await self.websocket.send_json({
                 "sender": "bot",
@@ -121,7 +146,32 @@ class NuCoreAssistant:
                 "end": 'true' if is_end else 'false'
             })
         else:
-            print(f"Assistant: {message}")
+            print(message, end="", flush=True)
+
+    async def send_user_content_to_llm(self, user_content):
+        """
+        Send user content to the LLM for processing.
+        :param user_content: The content provided by the user.
+        """
+        if not user_content:
+            print("No user content provided, exiting ...")
+            return
+        user_message = {
+            "role": "user",
+            "content": f"{user_content.strip()}"
+        }
+        messages = [user_message]
+        payload={
+            "messages": messages,
+            "stream": False,
+            "temperature": 2.0,
+            "max_tokens": 60_000,
+        }
+
+        response = requests.post(config.getModelURL(), json=payload)
+        response.raise_for_status()
+        await self.send_response(response.json()["choices"][0]["message"]["content"])
+        return None
 
     async def process_customer_input(self, query:str, num_rag_results=5, rerank=True):
         """
@@ -136,6 +186,12 @@ class NuCoreAssistant:
         messages =[]
 
         device_docs = ""
+        if not self.nuCore.load_devices(include_profiles=False):
+                raise ValueError("Failed to load devices from NuCore. Please check your configuration.")
+
+        # Load RAG documents
+        #if not self.nuCore.load_rag_docs(dump=False):
+        #    raise ValueError("Failed to load RAG documents from NuCore. Please check your configuration.")
         rag = self.nuCore.format_nodes()
         if not rag:
             raise ValueError(f"Warning: No RAG documents found for node {self.nuCore.url}. Skipping.")
@@ -205,7 +261,6 @@ class NuCoreAssistant:
                         try:
                             finish_reason = json.loads(token_data.strip())['choices'][0]['finish_reason']
                             if finish_reason == "stop":
-                                print("\n--- Stream completed ---")
                                 break
                             token_data = json.loads(token_data.strip())['choices'][0]['delta'].get('content', '')
                         except json.JSONDecodeError:
@@ -214,33 +269,15 @@ class NuCoreAssistant:
                             # Print the token data as it arrives
                             if isinstance(token_data, bytes):
                                 token_data = token_data.decode("utf-8")
-                            #if token_data.strip():  # Only print non-empty tokens
-                            print(token_data, end="", flush=True)
+                            await self.send_response(token_data, False)
+                            #full_response += token_data  # Collect the token data
                             full_response += token_data
+
 
             # now parse the full response and look for blocks between __NUCORE_COMMAND_BEGIN__ and __NUCORE_COMMAND_END__. 
             # convert the blocks to json and add to list
-            commands = []
-            command_pattern = re.compile(r'__BEGIN_NUCORE_COMMAND__(.*?)__END_NUCORE_COMMAND__', re.DOTALL)
-            matches = command_pattern.findall(full_response)
-
-            for match in matches:
-                try:
-                    # Remove any comments that start with //, # or /* and end with */
-                    match = re.sub(r'//.*?$|#.*?$|/\*.*?\*/', '', match, flags=re.MULTILINE)
-                    # Remove any leading or trailing whitespace
-                    match = match.strip()
-                    if not match:
-                        continue
-                    # Parse the JSON block
-                    command_json = json.loads(match.strip())
-                    commands.append(command_json)
-                except json.JSONDecodeError as e:
-                    print(f"Error decoding JSON from command block: {e}")
-
-            if commands:
-                print("****Time to run some commands!")
-                print (commands)
+            await self.process_tool_call(full_response, "__BEGIN_NUCORE_COMMAND__", "__END_NUCORE_COMMAND__")
+            await self.process_tool_call(full_response, "__BEGIN_NUCORE_PROPERTY_QUERY__", "__END_NUCORE_PROPERTY_QUERY__")
 
         except Exception as e:
             print(f"An error occurred while processing the customer input: {e}")

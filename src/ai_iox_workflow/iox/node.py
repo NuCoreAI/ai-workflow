@@ -1,22 +1,12 @@
 from textwrap import indent
 from dataclasses import dataclass, field
-from .nodedef import NodeDef
+from .nodedef import NodeDef, Property
 
 
 @dataclass
 class TypeInfo:
     id: str
     val: str
-
-
-@dataclass
-class Property:
-    id: str
-    value: str
-    formatted: str
-    uom: str
-    prec: int = field(default=None)
-    name: str = field(default=None)
 
 
 @dataclass
@@ -39,7 +29,7 @@ class Node:
     rpnode: str = field(default=None)
     sgid: int = field(default=None)
     typeInfo: list[TypeInfo] = field(default_factory=list)
-    property: list[Property] = field(default_factory=list)
+    properties: dict[str, Property] = field(default_factory=dict) 
     parent: str = field(default=None)
     custom: dict = field(default=None)
     devtype: dict = field(default=None)

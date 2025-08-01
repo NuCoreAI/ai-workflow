@@ -4,6 +4,8 @@
 import requests
 import json
 import re
+import xml.etree.ElementTree as ET
+from .nodedef import NodeDef, Property
 
 default_base_url="http://localhost:8080"
 default_username="admin"
@@ -52,6 +54,111 @@ class nucoreAPI:
 
     def get_nodes(self):
         response = self.__get("/rest/nodes")
+        if response == None:
+            return None
+        return response.text
+
+    def get_properties(self, device_id:str)-> dict[str, Property]:
+        """
+        Get properties of a device by its ID.
+        
+        Args:
+            device_id (str): The ID of the device to get properties for.
+        
+        Returns:
+            dict[str, Property]: A dictionary of properties for the device.
+        Raises:
+            ValueError: If the device_id is empty or if the response cannot be parsed.
+        """
+        if not device_id:
+            raise ValueError("Device ID cannot be empty")
+        
+        response = self.__get(f"/rest/nodes/{device_id}")
+        if response == None:
+            return None
+        try:
+            root = ET.fromstring(response.text)
+            property_elems = root.findall(".//property")
+            properties = {}
+            for p_elem in property_elems:
+                prop = Property(
+                    id=p_elem.get("id"),
+                    value=p_elem.get("value"),
+                    formatted=p_elem.get("formatted"),
+                    uom=p_elem.get("uom"),
+                    prec=int(p_elem.get("prec")) if p_elem.get("prec") else None,
+                    name=p_elem.get("name"),
+                )
+                properties[prop.id] = prop 
+        except ET.ParseError as e:
+            print(f"Error parsing XML response: {e}")
+            return None
+        except Exception as e:
+            print(f"Error processing properties: {e}")
+            return None
+
+        return properties
+
+    def send_commands(self, commands:list):
+        """
+        Send commands to a device.
+
+        Args:
+            commands (list): A list of command dictionaries to send.
+        
+        Returns:
+            str: The response from the server.
+        
+        Raises:
+            ValueError: If the command format is invalid or if required fields are missing.
+        """
+
+        """"
+        __BEGIN_NUCORE_COMMAND__
+        {
+        "device_id": "<DEVICE_ID>",
+        "command_id": "<COMMAND_ID>",
+        "command_params": [
+            {
+            "id": "<PARAM_ID>",
+            "value": <VALUE>,
+            "uom": "<UNIT>",
+            "precision": <PRECISION>
+            }
+        ]
+        }
+        __END_NUCORE_COMMAND__
+        """
+
+        if not commands or len(commands) == 0:
+            print("No commands to send")
+            return None
+        
+        for command in commands:
+            if not isinstance(command, dict):
+                print(f"Invalid command format: {command}")
+                continue
+
+        device_id = command.get("device_id")
+        if not device_id:
+            raise ValueError("No device ID found in command")
+        command_id = command.get("command_id")
+        if not command_id:
+            raise ValueError("No command ID found in command")
+        command_params = command.get("command_params", [])
+        
+        # Construct the url: /rest/nodes/<device_id>/cmd/<command_id>/<params[value] 
+
+        url = f"/rest/nodes/{device_id}/cmd/{command_id}"
+        for param in command_params:
+            value= param.get("value")
+            if value:
+                url+=f"/{value}"
+#            uom = param.get("uom")
+#            if uom:
+#                url+=f"/.uom{uom}"
+
+        response = self.__get(url)
         if response == None:
             return None
         return response.text
