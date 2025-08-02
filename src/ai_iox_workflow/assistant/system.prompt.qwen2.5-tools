@@ -30,18 +30,17 @@ __BEGIN_NUCORE_COMMAND__
     {
       "id": "<PARAM_ID> IF NOT BLANK",
       "value": <VALUE>,
-      "uom": "<UOM ID>",
+      "uom": "<UOM_ID>",
     }
   ]
 }
 __END_NUCORE_COMMAND__
 
-- Use this only when the query requests an **action**.
-- For commands with no parameters, return an empty `command_params` array.
+- **Always use UOM_ID and not UOM_NAME**
+- If parameter id is blank, do NOT invent it 
+- Use this only when the query requests an **action** 
 - For multiple commands, repeat the block above for each command.
 - Use only exact values, IDs, and formats from DEVICE STRUCTURE. 
-- **Do not invent parameter names and ids**
-- **Do not include any extra explanation or free text. Output JSON only.**
 
 ---
 

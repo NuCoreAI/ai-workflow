@@ -110,8 +110,11 @@ class NuCoreAssistant:
     async def process_tool_call(self,full_response:str, begin_marker, end_marker):
         if not full_response or not begin_marker or not end_marker:
             return None
-        
-        parameters = []
+
+        #we need an ordered command list to process. The order is important:
+        # first command must run first and second next etc.
+        parameters = [] #ordered set of commands 
+
         command_pattern = re.compile(rf'{begin_marker}(.*?){end_marker}', re.DOTALL)
         matches = command_pattern.findall(full_response)
 
@@ -208,7 +211,7 @@ class NuCoreAssistant:
 
         sprompt = system_prompt.replace("{device_docs}", device_docs)
         sprompt.strip()
-        print(sprompt)
+        #print(sprompt)
 
         system_message = {
             "role": "system",
