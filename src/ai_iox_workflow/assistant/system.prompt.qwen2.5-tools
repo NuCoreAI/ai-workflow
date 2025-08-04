@@ -28,7 +28,7 @@ __BEGIN_NUCORE_COMMAND__
   "command_id": "<COMMAND_ID>",
   "command_params": [
     {
-      "id": "<PARAM_ID> IF NOT BLANK",
+      "id": "<PARAM_ID>, 
       "value": <VALUE>,
       "uom": "<UOM_ID>",
     }
@@ -37,7 +37,7 @@ __BEGIN_NUCORE_COMMAND__
 __END_NUCORE_COMMAND__
 
 - **Always use UOM_ID and not UOM_NAME**
-- If parameter id is blank, do NOT invent it 
+- **If query is about the future, look for **forecast**
 - Use this only when the query requests an **action** 
 - For multiple commands, repeat the block above for each command.
 - Use only exact values, IDs, and formats from DEVICE STRUCTURE. 
@@ -46,7 +46,7 @@ __END_NUCORE_COMMAND__
 
 ###  2. Live Property or Status Request — When the user asks for a **real-time value** (e.g., “Is the light on?” or “What’s the current temperature?” or "waht is cool temp" or "how many miles can I drive" or "what's my range")
 
-Emit the following structure to request live data:
+Fore **each** requested live property/status, emit the following structure 
 
 __BEGIN_NUCORE_PROPERTY_QUERY__
 {

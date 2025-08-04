@@ -16,10 +16,11 @@ class UOMEntry:
     def __str__(self):
         return f"{self.name} ({self.label})"
 
+UNKNOWN_UOM = 0
 
 PREDEFINED_UOMS = {
     "0": UOMEntry(
-        id="0",
+        id=f"{UNKNOWN_UOM}",
         description="The unit of measure is unknown",
         label="Unknown",
         name="",

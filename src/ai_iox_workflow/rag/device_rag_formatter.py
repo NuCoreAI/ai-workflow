@@ -77,7 +77,7 @@ class DeviceRagFormatter(RAGFormatter):
                     i=1
                     with self.block():
                         for param in command.parameters:
-                            self.write(f"Parameter {i}: {param.name if param.name else param.id} [{param.id}]")
+                            self.write(f"Parameter {i}: name={param.name if param.name else 'n/a'} [id={param.id if param.id else 'n/a'}]")
                             i += 1
                             if param.editor and param.editor.ranges:
                                 for range in param.editor.ranges:

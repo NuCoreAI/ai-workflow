@@ -6,6 +6,7 @@ import json
 import re
 import xml.etree.ElementTree as ET
 from .nodedef import NodeDef, Property
+from .uom import PREDEFINED_UOMS, UNKNOWN_UOM
 
 default_base_url="http://localhost:8080"
 default_username="admin"
@@ -44,7 +45,35 @@ class nucoreAPI:
         except Exception as ex:
             print (f"failed post: {ex}")
             return None
+        
+    def __get_uom(self, uom):
+        """
+        checks to see if UOM is an integer and it belongs to a known UOM. 
+        if not, it uses string to find the UOM_ID.
+        Args:
+            uom (str or int): The unit of measure to check.
+        
+        Returns:
+            int: The UOM ID if found, otherwise None.
+        """
+        try:
+            uom_id:int = int(uom)
+            if uom_id in PREDEFINED_UOMS:
+                return uom_id
+            else:
+                print(f"UOM {uom_id} is not a known UOM")
+                return UNKNOWN_UOM 
+        except ValueError:
+            if isinstance(uom, str):
+                if uom.upper() == "ENUM":
+                    return 25 #index
+                else:
+                    for uom_id, uom_entry in PREDEFINED_UOMS.items():
+                        if uom_entry.label.upper() == uom.upper() or uom_entry.name.upper() == uom.upper():
+                            return int (uom_entry.id)
 
+        return  UNKNOWN_UOM
+    
     def get_profiles(self):
         response = self.__get("/rest/profiles")
         if response == None:
@@ -156,14 +185,14 @@ class nucoreAPI:
                 uom = param.get("uom", None)
                 value = param.get("value", None)
                 if value is not None:
-                    if id is None or id == '':
+                    if id is None or id == '' or id == "n/a" or id == "N/A":
                         url += f"/{value}"
                         if uom is not None:
-                            url += f"/{uom}"
+                            url += f"/{self.__get_uom(uom)}"
                     else:
                         url += f"?{id}"
                         if uom is not None:
-                            url += f".{uom}"
+                            url += f".{self.__get_uom(uom)}"
                         url += f"={value}"
             elif len(command_params) > 1:
                 unamed_params = [p for p in command_params if not p.get("id")]
@@ -178,7 +207,7 @@ class nucoreAPI:
                     url += f"/{value}"
                     uom = param.get("uom", None)
                     if uom is not None:
-                        url += f"/{uom}"
+                        url += f"/{self.__get_uom(uom)}"
 
                 if len(named_params) > 0:
                     i = 0
@@ -187,7 +216,7 @@ class nucoreAPI:
                         the_rest_of_the_url = ""
                         id = param.get("id", None)
                         value = param.get("value", None)
-                        if id is None or id == '':
+                        if id is None or id == '' or id == "n/a" or id == "N/A":
                             print(f"No id found for named parameter in command {command_id}")
                             continue
                         if value is None:
@@ -197,7 +226,7 @@ class nucoreAPI:
                         the_rest_of_the_url = f"?{id}" if i == 0 else f"&{id}"
                         uom = param.get("uom", None)
                         if uom is not None:
-                            the_rest_of_the_url += f".{uom}"
+                            the_rest_of_the_url += f".{self.__get_uom(uom)}"
                         the_rest_of_the_url += f"={value}"
                         url += the_rest_of_the_url
                         i += 1
