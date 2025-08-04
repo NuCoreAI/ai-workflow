@@ -16,6 +16,7 @@ class Node:
     address: str
     name: str
     family: int
+    instance: int
     hint: str
     type: str
     enabled: bool

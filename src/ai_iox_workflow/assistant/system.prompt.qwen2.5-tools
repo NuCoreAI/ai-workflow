@@ -44,7 +44,7 @@ __END_NUCORE_COMMAND__
 
 ---
 
-###  2. Live Property or Status Request — When the user asks for a **real-time value** (e.g., “Is the light on?” or “What’s the current temperature?” or "waht is cool temp")
+###  2. Live Property or Status Request — When the user asks for a **real-time value** (e.g., “Is the light on?” or “What’s the current temperature?” or "waht is cool temp" or "how many miles can I drive" or "what's my range")
 
 Emit the following structure to request live data:
 

@@ -129,7 +129,7 @@ class nucoreAPI:
         }
         __END_NUCORE_COMMAND__
         """
-
+        responses = []
         if not commands or len(commands) == 0:
             print("No commands to send")
             return None
@@ -156,7 +156,7 @@ class nucoreAPI:
                 uom = param.get("uom", None)
                 value = param.get("value", None)
                 if value is not None:
-                    if id is None:
+                    if id is None or id == '':
                         url += f"/{value}"
                         if uom is not None:
                             url += f"/{uom}"
@@ -187,7 +187,7 @@ class nucoreAPI:
                         the_rest_of_the_url = ""
                         id = param.get("id", None)
                         value = param.get("value", None)
-                        if id is None:
+                        if id is None or id == '':
                             print(f"No id found for named parameter in command {command_id}")
                             continue
                         if value is None:
@@ -201,8 +201,9 @@ class nucoreAPI:
                         the_rest_of_the_url += f"={value}"
                         url += the_rest_of_the_url
                         i += 1
-
-            response = self.__get(url)
+            responses.append(self.__get(url))
+        print(responses)
+        return responses
 
     
     def get_d2d_key(self):

@@ -86,6 +86,8 @@ class NuCore:
                 debug(f"Family {fidx} is a string, expected dict")
                 continue
             instances = []
+            #mpg names hack
+            mpg_index = 0
             for iidx, i in enumerate(f.get("instances", [])):
                 # Build Editors for reference first
                 editors_dict = {}
@@ -137,9 +139,10 @@ class NuCore:
                             debug(
                                 f"Editor '{eid}' not found for property '{pdict.get('id')}' in nodedef '{ndict['id']}'"
                             )
+
                         props.append(
                             NodeProperty(
-                                id=pdict["id"],
+                                id=pdict.get("id"),
                                 editor=editor,
                                 name=pdict.get("name"),
                                 hide=pdict.get("hide"),
@@ -190,7 +193,7 @@ class NuCore:
                     # Build NodeDef
                     nodedefs.append(
                         NodeDef(
-                            id=ndict["id"],
+                            id=ndict.get("id"),
                             properties=props,
                             cmds=cmds,
                             nls=ndict.get("nls"),
@@ -246,7 +249,7 @@ class NuCore:
         for family in self.profile.families:
             for instance in family.instances:
                 for nodedef in getattr(instance, "nodedefs", []):
-                    self.lookup[nodedef.id] = nodedef
+                    self.lookup[f"{nodedef.id}.{family.id}.{instance.id}"] = nodedef
         return self.lookup
     
     def __load_nodes__(self):
@@ -400,14 +403,26 @@ class NuCore:
                 )
                 properties[prop.id] = prop 
 
+            # youtube hack
             node_def_id = node_elem.get("nodeDefId")
+            family_elem = node_elem.find("./family")
+            if family_elem is not None:
+                try:
+                    family_id = int(family_elem.text)
+                except (ValueError, TypeError):
+                    family_id = 0
+                try:
+                    instance_id = int(family_elem.get("instance"))
+                except (ValueError, TypeError):
+                    instance_id = 1
 
             node = Node(
                 flag=int(node_elem.get("flag")),
                 nodeDefId=node_def_id,
                 address=node_elem.find("./address").text,
                 name=node_elem.find("./name").text,
-                family=int(node_elem.find("./family").text) if node_elem.find("./family") is not None else None,
+                family=family_id,
+                instance=instance_id,
                 hint=node_elem.find("./hint").text if node_elem.find("./hint") is not None else None,
                 type=node_elem.find("./type").text if node_elem.find("./type") is not None else None,
                 enabled=(node_elem.find("./enabled").text.lower() == "true"),
@@ -436,7 +451,7 @@ class NuCore:
                 else None,
             )
             if self.profile and node_def_id:
-                node.node_def = self.lookup.get(node_def_id)
+                node.node_def = self.lookup.get(f"{node_def_id}.{family_id}.{instance_id}")
                 if not node.node_def:
                     debug(f"[WARN] No NodeDef found for: {node_def_id}")
 

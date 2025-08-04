@@ -211,7 +211,8 @@ class NuCoreAssistant:
 
         sprompt = system_prompt.replace("{device_docs}", device_docs)
         sprompt.strip()
-        #print(sprompt)
+        with open(f"/tmp/ai.prompt", "w") as f:
+            f.write(sprompt)
 
         system_message = {
             "role": "system",
