@@ -342,7 +342,12 @@ PREDEFINED_UOMS = {
         name="\u2126",
         category_id="resistance",
     ),
-    "51": UOMEntry(id="51", description="Percent", label="%", name="%"),
+    "51": UOMEntry(
+        id="51", 
+        description="Percent", 
+        label="%", 
+        name="%"
+    ),
     "52": UOMEntry(
         id="52",
         description="Weight in Pounds",

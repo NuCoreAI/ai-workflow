@@ -303,20 +303,25 @@ async def main(args):
     print("Welcome to NuCore AI Assistant!")
     print("Type 'quit' to exit")
     assistant = NuCoreAssistant(args, websocket=None)  # Replace with actual websocket connection if needed
+    i=0
     
     while True:
         try:
-            user_input = input("\nEnter your request: ").strip()
-            
-            if user_input.lower() == 'quit':
-                print("Goodbye!")
-                break
-                
+            user_input = input("\nWhat can I do for you? > " if i==0 else "\n> ").strip()
+            i+=1
+
             if not user_input:
                 print("Please enter a valid request")
                 continue
+
+            if user_input.lower() == 'quit':
+                print("Goodbye!")
+                break
+
+            print(f"\n>>>>>>>>>>\n")
                 
             await assistant.process_customer_input(user_input, num_rag_results=3, rerank=False)
+            print ("\n\n<<<<<<<<<<\n")
             
         except Exception as e:
             print(f"An error occurred: {e}")

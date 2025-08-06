@@ -57,15 +57,17 @@ class nucoreAPI:
             int: The UOM ID if found, otherwise None.
         """
         try:
-            uom_id:int = int(uom)
-            if uom_id in PREDEFINED_UOMS:
-                return uom_id
+            if isinstance(uom, int):
+                # If uom is an integer, check if it is in the predefined UOMs
+                uom = str(uom)
+            if uom in PREDEFINED_UOMS.keys():
+                return int(uom)
             else:
-                print(f"UOM {uom_id} is not a known UOM")
+                print(f"UOM {uom} is not a known UOM")
                 return UNKNOWN_UOM 
         except ValueError:
             if isinstance(uom, str):
-                if uom.upper() == "ENUM":
+                if uom.upper() == "ENUM" or uom.upper() == "INDEX":
                     return 25 #index
                 else:
                     for uom_id, uom_entry in PREDEFINED_UOMS.items():
