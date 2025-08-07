@@ -27,7 +27,7 @@ cmake -B build.cuda -DGGML_CUDA=on
 ```
 followed by
 ```shell
-cmake --build build.cuda --conifg release
+cmake --build build.cuda --config release
 ```
 If you have x running, you may want to have it release resources. First use nvidia-smi utility to see what's running and how much memory is being used by other things:
 ```shell

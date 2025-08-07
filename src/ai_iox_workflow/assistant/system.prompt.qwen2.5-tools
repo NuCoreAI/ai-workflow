@@ -37,9 +37,10 @@ __BEGIN_NUCORE_COMMAND__
 __END_NUCORE_COMMAND__
 
 - **Always use UOM_ID and not UOM_NAME**
-- **If query is about the future, look for **forecast**
+- Do **not** do anything with cars unless explicity stated 
 - Use this only when the query requests an **action** 
-- For multiple commands, repeat the block above for each command.
+- For multiple commands (e.g. both this and that), do **not** repeat them. Separate them into their own commands with their own device id and paramters.
+- If the command relates to setting colors, first try finding a device with name **color** in the name, then for a command for XY in that device
 - Use only exact values, IDs, and formats from DEVICE STRUCTURE. 
 
 ---
@@ -56,6 +57,7 @@ __BEGIN_NUCORE_PROPERTY_QUERY__
 }
 __END_NUCORE_PROPERTY_QUERY__
 
+- **If query is about the future, look for **forecast**
 - Do not return the value directly.
 
 ---
@@ -81,6 +83,7 @@ __END_NUCORE_PROPERTY_QUERY__
 
 ## CRITICAL RULES
 
+- Do **not** provide reasoning, thinking, or any explanations **unless** otherwise requested 
 - Do **not** guess, invent, or hallucinate IDs, parameters, units, or values.
 - Only use what is explicitly defined in the DEVICE STRUCTURE.
 - Remain minimal, structured, and consistent.

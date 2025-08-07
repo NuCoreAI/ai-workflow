@@ -29,13 +29,6 @@ if tools:
         #    if "function" in tool and "examples" in tool["function"]:
         #        del tool["function"]["examples"]
 
- 
-comfort_settings="""
-     Normal: for price between 30 cents and 49 cents
-     Moderate: for price between 50 cents and 79 cents 
-     High: for price above 80 cents""" 
-
-
 class NuCoreAssistant:
     def __init__(self, args, websocket=None):
         self.websocket=websocket
@@ -49,15 +42,10 @@ class NuCoreAssistant:
             username=args.username,
             password=args.password
         )
+        self.__model_url__ = args.remote_model_url+"/v1/chat/completions" if args.remote_model_url else config.getModelURL()
+        print (self.__model_url__)
         self.nuCore.load()
 
-
-    async def get_comfort_settings(self, customer_input:str):
-        await self.send_response(f"Your comfort settings are: \r\n{comfort_settings}", True)
-
-    async def set_comfort_settings(self, customer_input:str):
-        await self.send_response(f"Ok, I set your comfort settings to: \r\n{customer_input['customer_input']}", True)
-    
     async def create_automation_routine(self,customer_input:list):
         if not customer_input or 'individual_prompts' not in customer_input :
             return ("apologies, it seems that I may have lost your request. Please try again")
@@ -174,7 +162,7 @@ class NuCoreAssistant:
             "max_tokens": 60_000,
         }
 
-        response = requests.post(config.getModelURL(), json=payload)
+        response = requests.post(self.__model_url__, json=payload)
         response.raise_for_status()
         await self.send_response(response.json()["choices"][0]["message"]["content"])
         return None
@@ -222,13 +210,15 @@ class NuCoreAssistant:
         if not query:
             await self.send_response("No query provided, exiting ...", True)
             return None
-        if query.startswith("!!"):
+        if query.startswith("?"):
+            query = "\n"+query[1:].strip()  # Remove leading '?' if presented
+        else:
             # This is a code-only query, so we don't need to send the system prompt
-            query = "[no-code][no-explanation] " + query 
+            query = f"**code-only** **no-explanation**\n{query}"
 
         user_message = {
             "role": "user",
-            "content": f"USER QUERY:\n{query}"
+            "content": f"USER QUERY:{query}"
         }
 
         #first use rag for relevant documents
@@ -268,7 +258,7 @@ class NuCoreAssistant:
             payload["tool_choice"] = "auto" 
         full_response = ""
         try:
-            with httpx.stream("POST", config.getModelURL(), timeout=100, json=payload
+            with httpx.stream("POST", self.__model_url__, timeout=100, json=payload
             ) as response:
                 for line in response.iter_lines():
                     if line.startswith("data: "):
@@ -366,6 +356,14 @@ if __name__ == "__main__":
         required=False,
         help="The password to authenticate with the nucore platform",
     )
+    parser.add_argument(
+        "--remote_model_url",
+        dest="remote_model_url",
+        type=str,
+        required=False,
+        help="The URL of the remote model. If provided, this should be a valid URL that responds to OpenAI's API requests.",
+    )
+
 
     args = parser.parse_args()
     asyncio.run(main(args))

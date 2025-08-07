@@ -211,6 +211,7 @@ class nucoreAPI:
                     if uom is not None:
                         url += f"/{self.__get_uom(uom)}"
 
+                no_name_param1 = False
                 if len(named_params) > 0:
                     i = 0
                     # Add named parameters to the url
@@ -218,14 +219,20 @@ class nucoreAPI:
                         the_rest_of_the_url = ""
                         id = param.get("id", None)
                         value = param.get("value", None)
-                        if id is None or id == '' or id == "n/a" or id == "N/A":
-                            print(f"No id found for named parameter in command {command_id}")
-                            continue
                         if value is None:
                             print(f"No value found for named parameter {id} in command {command_id}")
                             continue
+                        if id is None or id == '' or id == "n/a" or id == "N/A":
+                            if i == 0:
+                                no_name_param1 = True
+                                url+= f"/{value}/"
+                                i+= 1
+                                continue
 
-                        the_rest_of_the_url = f"?{id}" if i == 0 else f"&{id}"
+                            print(f"No id found for named parameter in command {command_id}")
+                            continue
+
+                        the_rest_of_the_url = f"?{id}" if i == 0 else f"?{id}" if no_name_param1 else f"&{id}"
                         uom = param.get("uom", None)
                         if uom is not None:
                             the_rest_of_the_url += f".{self.__get_uom(uom)}"

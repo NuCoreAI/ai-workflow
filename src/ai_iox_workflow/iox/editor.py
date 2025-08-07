@@ -61,7 +61,7 @@ class EditorSubsetRange:
         Returns a description of the subset.
         """
         #desc = f"Enum of Unit {self.uom.label}"
-        desc = "Enum"
+        desc = f"Enum [uom id={self.uom.id}]"
         return desc
 
     def get_names(self):

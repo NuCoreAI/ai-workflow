@@ -18,6 +18,20 @@
             "justMyCode": false
         },
         {
+            "name": "remmote-assistant", 
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/ai_iox_workflow/assistant/assistant.py",
+            "console": "integratedTerminal",
+            "args": [
+               "--url=http://192.168.4.225:8080" ,
+               "--username=admin",
+               "--password=admin",
+               "--remote_model_url=https://vyvhz7of8dar39-8013.proxy.runpod.net"
+            ],
+            "justMyCode": false
+        },
+        {
             "name": "nucore", 
             "type": "debugpy",
             "request": "launch",
