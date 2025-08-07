@@ -4,6 +4,8 @@ import re
 from ai_iox_workflow.iox.nodedef import NodeProperty
 from ai_iox_workflow.rag.rag_data_struct import RAGData
 from ai_iox_workflow.rag.rag_formatter import RAGFormatter
+from ai_iox_workflow.iox.node import Node
+
 
 DEVICE_SECTION_HEADER="***Device***"
 
@@ -37,11 +39,13 @@ class DeviceRagFormatter(RAGFormatter):
                 self.writer.level -= level_increase
 
         return BlockContext(self)
-    
-    def add_device_section(self, device_name:str, device_id: str):
+
+    def add_device_section(self, device: Node, parent: Node ):
         self.section(f"Device")
-        self.write(f"Name: {device_name}")
-        self.write(f"ID: {device_id}")
+        self.write(f"Name: {device.name}")
+        self.write(f"ID: {device.address}")
+        if parent:
+            self.write(f"Parent: {parent.name} [ID: {parent.address}]")
 
     def add_properties_section(self):
         with self.block():
@@ -90,8 +94,8 @@ class DeviceRagFormatter(RAGFormatter):
                                                 for name in range.get_names():
                                                     self.write(name)
 
-    def format_node(self, node):
-        self.add_device_section(node.name, node.address)
+    def format_node(self, node, parent):
+        self.add_device_section(node, parent)
         if node.node_def:
             if node.node_def.properties:
                 self.add_properties_section()
@@ -168,7 +172,11 @@ class DeviceRagFormatter(RAGFormatter):
             raise ValueError("Nodes must be a dictionary")
         nodes = kwargs["nodes"]
         for node in nodes.values():
-            self.format_node(node)
+            pnode = node.pnode
+            pnode = None if pnode is None or pnode == node.address else pnode 
+            if pnode:
+                pnode = nodes.get(pnode, None)
+            self.format_node(node, pnode)
         rag_docs:RAGData = RAGData()
         i = 0
         # Iterate through the lines to find device sections
