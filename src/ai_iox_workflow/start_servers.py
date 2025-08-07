@@ -1,4 +1,4 @@
-# Start the AI IOX workflow servers
+# Start the local llama.cpp servers 
 # This script is used to start the necessary servers for the AI IOX workflow.   
 # It is typically run in the background to keep the servers running.
 # It parses config.py to get the correct models for each server: embedding, ranking, and LLM.
