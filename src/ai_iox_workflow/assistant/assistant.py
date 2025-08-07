@@ -1,4 +1,5 @@
 import re
+import time 
 
 import requests
 import json
@@ -15,19 +16,10 @@ from ai_iox_workflow.nucore import NuCore
 Best option
 build.cuda/bin/llama-server -m /home/michel/workspace/nucore/models/finetuned/qwen2.5-coder-dls-7b/qwen2.5-coder-dls-7b-Q4_K_M.gguf --jinja --host localhost -c 60000 --port 8013 -t 15  --n-gpu-layers 32 --batch-size 8192
 """
-tools = False
 
 config = AIConfig()
-# if tools else "/system.prompt.qwen2.5"}", "r") as f:
-with open(f"{config.__assistant_path__}/system.prompt.qwen2.5-tools", "r") as f:
+with open(f"{config.__assistant_path__}/nucore.system.prompt", "r") as f:
     system_prompt = f.read().strip()
-
-if tools:
-    with open(config.getToolsFile()) as f:
-        tools = json.load(f)
-        #for tool in tools:
-        #    if "function" in tool and "examples" in tool["function"]:
-        #        del tool["function"]["examples"]
 
 class NuCoreAssistant:
     def __init__(self, args, websocket=None):
@@ -43,8 +35,17 @@ class NuCoreAssistant:
             password=args.password
         )
         self.__model_url__ = args.remote_model_url+"/v1/chat/completions" if args.remote_model_url else config.getModelURL()
+        self.__remote_auth_token__ = args.remote_auth_token if args.remote_auth_token else None
         print (self.__model_url__)
         self.nuCore.load()
+
+    def set_remote_model_access_token(self, token: str):
+        """
+        You are responsible for refreshing the access token
+        Set the remote model access token.
+        :param token: The access token to set.
+        """
+        self.__remote_auth_token__ = token
 
     async def create_automation_routine(self,customer_input:list):
         if not customer_input or 'individual_prompts' not in customer_input :
@@ -162,7 +163,9 @@ class NuCoreAssistant:
             "max_tokens": 60_000,
         }
 
-        response = requests.post(self.__model_url__, json=payload)
+        response = requests.post(self.__model_url__, json=payload, headers={
+            "Authorization": f"Bearer {self.__remote_auth_token__}" if self.__remote_auth_token__ else "",
+        })
         response.raise_for_status()
         await self.send_response(response.json()["choices"][0]["message"]["content"])
         return None
@@ -253,30 +256,35 @@ class NuCoreAssistant:
             "temperature": 0.0,
             "max_tokens": 60_000,
         }
-        if tools:
-            payload["tools"] = tools
-            payload["tool_choice"] = "auto" 
         full_response = ""
         try:
-            with httpx.stream("POST", self.__model_url__, timeout=100, json=payload
-            ) as response:
-                for line in response.iter_lines():
-                    if line.startswith("data: "):
-                        token_data = line[len(b"data: "):]
-                        try:
-                            finish_reason = json.loads(token_data.strip())['choices'][0]['finish_reason']
-                            if finish_reason == "stop":
-                                break
-                            token_data = json.loads(token_data.strip())['choices'][0]['delta'].get('content', '')
-                        except json.JSONDecodeError:
-                            continue
-                        if token_data:
-                            # Print the token data as it arrives
-                            if isinstance(token_data, bytes):
-                                token_data = token_data.decode("utf-8")
-                            await self.send_response(token_data, False)
-                            #full_response += token_data  # Collect the token data
-                            full_response += token_data
+            with httpx.stream("POST", self.__model_url__, timeout=100, json=payload,headers={
+                "Authorization": f"Bearer {self.__remote_auth_token__}" if self.__remote_auth_token__ else "",
+            }) as response:
+                if response.status_code == 401:
+                    print(f"Authorization token is invalid or expired. You need to refresh it.")
+                    return None
+                elif response.status_code == 500:
+                    print(f"Internal server error. Please try again later (most probably the authorization token is invalid or expired).")
+                    return None
+                else:
+                    for line in response.iter_lines():
+                        if line.startswith("data: "):
+                            token_data = line[len(b"data: "):]
+                            try:
+                                finish_reason = json.loads(token_data.strip())['choices'][0]['finish_reason']
+                                if finish_reason == "stop":
+                                    break
+                                token_data = json.loads(token_data.strip())['choices'][0]['delta'].get('content', '')
+                            except json.JSONDecodeError:
+                                continue
+                            if token_data:
+                                # Print the token data as it arrives
+                                if isinstance(token_data, bytes):
+                                    token_data = token_data.decode("utf-8")
+                                await self.send_response(token_data, False)
+                                #full_response += token_data  # Collect the token data
+                                full_response += token_data
 
 
             # now parse the full response and look for blocks between __NUCORE_COMMAND_BEGIN__ and __NUCORE_COMMAND_END__. 
@@ -362,6 +370,13 @@ if __name__ == "__main__":
         type=str,
         required=False,
         help="The URL of the remote model. If provided, this should be a valid URL that responds to OpenAI's API requests.",
+    )
+    parser.add_argument(
+        "--remote_auth_token",
+        dest="remote_auth_token",
+        type=str,
+        required=False,
+        help="Optional authentication token for the remote model API (if required by the remote model) to be used in the Authorization header. You are responsible for refreshing the token if needed.",
     )
 
 

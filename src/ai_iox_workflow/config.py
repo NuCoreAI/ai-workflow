@@ -15,7 +15,7 @@ class AIConfig:
     def __init__(self, install_dir:str=None, data_path:str=None, models_path:str=None):
         if not install_dir:
             install_dir = os.path.join(os.path.expanduser('~'), DEFAULT_NUCORE_INSTALL_DIR)
-        self.__data_path__:str = data_path if data_path else os.path.join(install_dir, DEFAULT_AI_INSTALL_DIR_NAME, "examples")
+        self.__data_path__:str = data_path if data_path else os.path.join(install_dir, DEFAULT_AI_INSTALL_DIR_NAME, "data")
         self.__models_path__:str = models_path if models_path else os.path.join(install_dir, "models")
         self.__iox_path__:str = os.path.join(install_dir, DEFAULT_AI_INSTALL_DIR_NAME, DEFAULT_IOX_INSTALL_DIR_NAME)
         self.__tools_path__:str = os.path.join(self.__iox_path__, "tools")

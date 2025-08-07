@@ -27,7 +27,8 @@
                "--url=http://192.168.4.225:8080" ,
                "--username=admin",
                "--password=admin",
-               "--remote_model_url=https://vyvhz7of8dar39-8013.proxy.runpod.net"
+               "--remote_model_url=https://vyvhz7of8dar39-8013.proxy.runpod.net",
+               "--remote_auth_token=eyJhbGciOiJFUzI1NiIsInR5cCI6ImF0K2p3dCJ9.eyJ1dWlkIjoiMDA6MjE6Yjk6MjY6MjY6MjYiLCJzdWIiOiJtaWNoZWxAdW5pdmVyc2FsLWRldmljZXMuY29tIiwiaWF0IjoxNzU0NTc2MTA4LCJleHAiOjE3NTQ1Nzk3MDgsImF1ZCI6WyJlaXN5IiwicG9ydGFsIl0sImlzcyI6InBvcnRhbCJ9.GN9I-_b90erFJeezuGCaInZtWZQucWA9nrQC5hTt_IU9H0vWoi7bpqSKlcdicudxYtdhiE9nkUQi_zMscRxmpg"
             ],
             "justMyCode": false
         },
