@@ -313,13 +313,14 @@ class NuCore:
         tools_rag_formatter = ToolsRAGFormatter(indent_str=" ", prefix="-")
         return tools_rag_formatter.format(tools_path=config.getToolsFile())
     
-    def format_static_info(self):
+    def format_static_info(self, path:str):
         """
         Format static information for fine tuning or other purposes.
-        :return: List of formatted static information.
+        :param path: Path to the static information directory.
+        :return: List of formatted static information to be used for embeddings.
         """
         static_info_rag_formatter = StaticInfoRAGFormatter(indent_str=" ", prefix="-")
-        return static_info_rag_formatter.format(static_info_path=config.getStaticInfoPath())
+        return static_info_rag_formatter.format(static_info_path=path)
 
     def load_rag_docs(self, **kwargs):
         """

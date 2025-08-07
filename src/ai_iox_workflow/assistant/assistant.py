@@ -261,7 +261,7 @@ class NuCoreAssistant:
             with httpx.stream("POST", self.__model_url__, timeout=100, json=payload,headers={
                 "Authorization": f"Bearer {self.__remote_auth_token__}" if self.__remote_auth_token__ else "",
             }) as response:
-                if response.status_code == 401:
+                if response.status_code == 401 or response.status_code == 403:
                     print(f"Authorization token is invalid or expired. You need to refresh it.")
                     return None
                 elif response.status_code == 500:

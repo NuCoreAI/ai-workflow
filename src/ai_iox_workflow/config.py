@@ -18,9 +18,6 @@ class AIConfig:
         self.__data_path__:str = data_path if data_path else os.path.join(install_dir, DEFAULT_AI_INSTALL_DIR_NAME, "data")
         self.__models_path__:str = models_path if models_path else os.path.join(install_dir, "models")
         self.__iox_path__:str = os.path.join(install_dir, DEFAULT_AI_INSTALL_DIR_NAME, DEFAULT_IOX_INSTALL_DIR_NAME)
-        self.__tools_path__:str = os.path.join(self.__iox_path__, "tools")
-        self.__tools_name__:str = "tools.json" 
-        self.__static_info_path__:str = os.path.join(self.__iox_path__, "static_info")
         self.__assistant_path__:str = os.path.join(self.__iox_path__, "assistant")
 
         self.__profile_file__ = "profile.json"
@@ -111,14 +108,4 @@ class AIConfig:
 
         return os.path.join(self.__data_path__, file)
     
-    def getToolsFile(self, file:str=None):
-        if not file:
-            return os.path.join(self.__tools_path__, self.__tools_name__)
-
-        return os.path.join(self.__tools_path__, file)  
     
-    def getStaticInfoPath(self, path:str=None):
-        if not path:
-            return self.__static_info_path__ 
-
-        return path

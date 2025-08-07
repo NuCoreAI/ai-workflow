@@ -5,7 +5,6 @@ Tool definitions for Static Information Retrieval
 Converts static information from text files into RAG chunks suitable for use in AI workflows/embeddings.
 The static information is formatted with a title, category, content, and exmaples. They are separated by "---end chuck---".
 """
-from ai_iox_workflow.config import AIConfig
 from ai_iox_workflow.rag.rag_data_struct import RAGData
 from ai_iox_workflow.rag.rag_formatter import RAGFormatter
 
@@ -20,10 +19,18 @@ class StaticInfoRAGFormatter(RAGFormatter):
         """
         Convert the formatted tools into a list of RAG documents.
         Each document contains an ID, category, and content.
-        :param static_info_path if provided if not the default from config will be used.
+        :param static_info_path is mandatory and should point to the directory containing static information files.
+        :return: RAGData object containing the static information documents.
+        :raises FileNotFoundError: If the static_info_path does not exist.
+        :raises ValueError: If the static_info_path is not provided.
+        :raises Exception: If the static_info_path is not a directory or if it contains no files.
         """
-        static_info_path=kwargs["static_info_path"] if "static_info_path" in kwargs else AIConfig().getStaticInfoPath()
+        if "static_info_path" not in kwargs:
+            raise ValueError("static_info_path is required to format static information.")
 
+        static_info_path = kwargs["static_info_path"]
+
+        # Check if the static_info_path exists
         if not Path(static_info_path).exists():
             raise FileNotFoundError(f"Static info file not found: {static_info_path}")
         
